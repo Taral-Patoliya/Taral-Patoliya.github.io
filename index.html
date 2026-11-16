@@ -1,11 +1,1415 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>My Website</title>
-</head>
-<body>
-    <h1>Hello, World!</h1>
-    <p>Welcome to my GitHub Pages site.</p>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1080, height=1920, initial-scale=1.0" />
+<title>How Turning Torso Was Designed</title>
+<style>
+ * {
+   box-sizing: border-box;
+   margin: 0;
+   padding: 0;
+   }
+   html, body {
+   width: 1080px;
+   height: 1920px;
+   overflow: hidden;
+   background: #dce7ef;
+   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+   -webkit-font-smoothing: antialiased;
+   }
+   #stage {
+   position: relative;
+   width: 1080px;
+   height: 1920px;
+   overflow: hidden;
+   background: linear-gradient(180deg, #d7e5ef 0%, #e9f1f6 48%, #f3f7fa 100%);
+   }
+   #c {
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 1080px;
+   height: 1920px;
+   display: block;
+   }
+   #vignette {
+   position: absolute;
+   inset: 0;
+   pointer-events: none;
+   background:
+   linear-gradient(180deg, rgba(220, 234, 244, 0.72) 0%, rgba(220, 234, 244, 0.0) 19%),
+   radial-gradient(circle at 50% 52%, rgba(255,255,255,0) 64%, rgba(16, 38, 56, 0.14) 100%);
+   }
+   #header {
+   position: absolute;
+   top: 76px;
+   left: 64px;
+   right: 64px;
+   pointer-events: none;
+   z-index: 20;
+   }
+   .eyebrow {
+   display: inline-flex;
+   align-items: center;
+   gap: 10px;
+   background: rgba(255, 255, 255, 0.92);
+   color: #16737e;
+   font-size: 21px;
+   font-weight: 800;
+   letter-spacing: 0.14em;
+   text-transform: uppercase;
+   padding: 10px 20px;
+   border-radius: 999px;
+   box-shadow: 0 8px 24px rgba(15, 36, 54, 0.10);
+   margin-bottom: 18px;
+   }
+   .eyebrow-dot {
+   width: 10px;
+   height: 10px;
+   border-radius: 50%;
+   background: #1b8a96;
+   }
+   #main-title {
+   font-size: 58px;
+   line-height: 1.08;
+   font-weight: 850;
+   letter-spacing: -0.025em;
+   color: #102130;
+   text-shadow: 0 2px 18px rgba(255, 255, 255, 0.85);
+   margin-bottom: 12px;
+   }
+   #sub-title {
+   font-size: 26px;
+   font-weight: 600;
+   color: #365066;
+   letter-spacing: -0.01em;
+   text-shadow: 0 1px 12px rgba(255, 255, 255, 0.9);
+   }
+   #leaders-svg {
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 1080px;
+   height: 1920px;
+   pointer-events: none;
+   z-index: 15;
+   }
+   #labels-layer {
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 1080px;
+   height: 1920px;
+   pointer-events: none;
+   z-index: 18;
+   }
+   .callout {
+   position: absolute;
+   background: rgba(255, 255, 255, 0.96);
+   border: 2px solid #ffffff;
+   border-radius: 18px;
+   padding: 18px 24px;
+   box-shadow:
+   0 14px 34px rgba(13, 32, 48, 0.16),
+   0 2px 6px rgba(13, 32, 48, 0.08);
+   backdrop-filter: blur(8px);
+   min-width: 280px;
+   max-width: 390px;
+   will-change: transform, opacity;
+   }
+   .callout-tag {
+   display: inline-block;
+   font-size: 16px;
+   font-weight: 800;
+   letter-spacing: 0.12em;
+   text-transform: uppercase;
+   color: #187a86;
+   margin-bottom: 4px;
+   }
+   .callout-title {
+   font-size: 28px;
+   line-height: 1.15;
+   font-weight: 850;
+   letter-spacing: -0.015em;
+   color: #102232;
+   margin-bottom: 5px;
+   }
+   .callout-desc {
+   font-size: 21px;
+   line-height: 1.3;
+   font-weight: 550;
+   color: #465f75;
+   }
+   #footer-bar {
+   position: absolute;
+   bottom: 54px;
+   left: 64px;
+   right: 64px;
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   pointer-events: none;
+   z-index: 20;
+   }
+   .spec-pill {
+   background: rgba(255, 255, 255, 0.90);
+   border-radius: 14px;
+   padding: 12px 20px;
+   box-shadow: 0 8px 22px rgba(15, 34, 52, 0.10);
+   display: flex;
+   align-items: baseline;
+   gap: 10px;
+   }
+   .spec-num {
+   font-size: 28px;
+   font-weight: 850;
+   color: #102232;
+   }
+   .spec-lbl {
+   font-size: 18px;
+   font-weight: 700;
+   text-transform: uppercase;
+   letter-spacing: 0.08em;
+   color: #187a86;
+   }
+   </style>
+   <script>
+   window.DURATION = 20;
+   </script>
+   <script type="importmap">
+   {
+   "imports": {
+   "three": "https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.module.min.js"
+   }
+   }
+   </script>
+   </head>
+   <body>
+   <div id="stage">
+   <canvas id="c" width="1080" height="1920"></canvas>
+   <div id="vignette"></div>
+<div id="header">
+<div class="eyebrow"><span class="eyebrow-dot"></span>Malmö, Sweden • Västra Hamnen</div>
+<div id="main-title">How Turning Torso Was Designed</div>
+<div id="sub-title">Architect Santiago Calatrava • Completed 2005</div>
+</div>
+<svg id="leaders-svg" viewBox="0 0 1080 1920" xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)">
+<defs>
+<filter id="lineShadow" x="-20%" y="-20%" width="140%" height="140%">
+<feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#0d2234" flood-opacity="0.28"/>
+</filter>
+</defs>
+<g id="leaders-group" filter="url(#lineShadow)"></g>
+</svg>
+<div id="labels-layer"></div>
+<div id="footer-bar">
+<div class="spec-pill"><span class="spec-num" id="hud-height">0 m</span><span class="spec-lbl">Height</span></div>
+<div class="spec-pill"><span class="spec-num" id="hud-floors">0 / 54</span><span class="spec-lbl">Floors</span></div>
+<div class="spec-pill"><span class="spec-num" id="hud-twist">0°</span><span class="spec-lbl">Twist</span></div>
+</div>
+</div>
+<script type="module">
+import * as THREE from 'three';
+const WIDTH = 1080;
+const HEIGHT = 1920;
+window.DURATION = 20;
+// Deterministic easing & math helpers
+const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const smoothstep = (edge0, edge1, x) => {
+const t = clamp((x - edge0) / (edge1 - edge0), 0, 1);
+return t * t * (3 - 2 * t);
+};
+const easeOutCubic = (t) => 1 - Math.pow(1 - clamp(t, 0, 1), 3);
+const easeOutQuart = (t) => 1 - Math.pow(1 - clamp(t, 0, 1), 4);
+const easeInOutCubic = (t) => {
+const x = clamp(t, 0, 1);
+return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+};
+const easeOutBackSoft = (t) => {
+const x = clamp(t, 0, 1);
+const c1 = 1.15;
+const c3 = c1 + 1;
+return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+};
+// Deterministic PRNG for city layout
+function mulberry32(seed) {
+let a = seed >>> 0;
+return function() {
+a |= 0;
+a = (a + 0x6D2B79F5) | 0;
+let t = Math.imul(a ^ (a >>> 15), 1 | a);
+t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+};
+}
+// Renderer setup
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({
+canvas,
+antialias: true,
+powerPreference: 'high-performance',
+preserveDrawingBuffer: true
+});
+renderer.setPixelRatio(1);
+renderer.setSize(WIDTH, HEIGHT, false);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.06;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+// Scene & atmospheric fog
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xe3edf4);
+scene.fog = new THREE.FogExp2(0xe3edf4, 0.00088);
+// Camera (telephoto-style architectural aerial lens)
+const camera = new THREE.PerspectiveCamera(37, WIDTH / HEIGHT, 2, 2200);
+// Procedural Sky Dome for subtle horizon-to-zenith gradient
+function createSkyDome() {
+const skyGeo = new THREE.SphereGeometry(1650, 32, 20);
+const pos = skyGeo.attributes.position;
+const colors = new Float32Array(pos.count * 3);
+const topCol = new THREE.Color(0xc5dbea);
+const midCol = new THREE.Color(0xdfeaf2);
+const botCol = new THREE.Color(0xeef4f8);
+const tmp = new THREE.Color();
+for (let i = 0; i < pos.count; i++) {
+const y = pos.getY(i) / 1650;
+if (y >= 0) {
+tmp.copy(midCol).lerp(topCol, Math.pow(y, 0.72));
+} else {
+tmp.copy(midCol).lerp(botCol, clamp(-y * 4, 0, 1));
+}
+colors[i * 3] = tmp.r;
+colors[i * 3 + 1] = tmp.g;
+colors[i * 3 + 2] = tmp.b;
+}
+skyGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+const skyMat = new THREE.MeshBasicMaterial({
+vertexColors: true,
+side: THREE.BackSide,
+depthWrite: false,
+fog: false
+});
+return new THREE.Mesh(skyGeo, skyMat);
+}
+scene.add(createSkyDome());
+// Procedural PMREM environment for realistic glass & glossy white steel reflections
+function setupEnvironment() {
+const pmrem = new THREE.PMREMGenerator(renderer);
+const envScene = new THREE.Scene();
+const envGeo = new THREE.SphereGeometry(50, 24, 16);
+const pos = envGeo.attributes.position;
+const cols = new Float32Array(pos.count * 3);
+const skyC = new THREE.Color(0xdbeaf5);
+const horC = new THREE.Color(0xffffff);
+const seaC = new THREE.Color(0x1f828d);
+const c = new THREE.Color();
+for (let i = 0; i < pos.count; i++) {
+const y = pos.getY(i) / 50;
+if (y > 0.05) c.copy(horC).lerp(skyC, clamp(y, 0, 1));
+else if (y > -0.05) c.copy(horC);
+else c.copy(horC).lerp(seaC, clamp(-y * 2.5, 0, 1));
+cols[i * 3] = c.r;
+cols[i * 3 + 1] = c.g;
+cols[i * 3 + 2] = c.b;
+}
+envGeo.setAttribute('color', new THREE.BufferAttribute(cols, 3));
+envScene.add(new THREE.Mesh(envGeo, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide })));
+const rt = pmrem.fromScene(envScene, 0.04);
+scene.environment = rt.texture;
+envGeo.dispose();
+pmrem.dispose();
+}
+setupEnvironment();
+// Lighting
+const hemiLight = new THREE.HemisphereLight(0xf2f8ff, 0xc8d4df, 1.18);
+hemiLight.position.set(0, 350, 0);
+scene.add(hemiLight);
+const sunLight = new THREE.DirectionalLight(0xfff9f0, 2.15);
+sunLight.position.set(175, 290, 145);
+sunLight.castShadow = true;
+sunLight.shadow.mapSize.width = 4096;
+sunLight.shadow.mapSize.height = 4096;
+sunLight.shadow.camera.near = 40;
+sunLight.shadow.camera.far = 760;
+const dShadow = 220;
+sunLight.shadow.camera.left = -dShadow;
+sunLight.shadow.camera.right = dShadow;
+sunLight.shadow.camera.top = dShadow;
+sunLight.shadow.camera.bottom = -dShadow;
+sunLight.shadow.bias = -0.00035;
+sunLight.shadow.normalBias = 0.03;
+scene.add(sunLight);
+const fillLight = new THREE.DirectionalLight(0xc8e0f4, 0.65);
+fillLight.position.set(-190, 160, -140);
+scene.add(fillLight);
+// Procedural Textures (Concrete formwork & Water ripples)
+function createConcreteTexture() {
+const c = document.createElement('canvas');
+c.width = 256;
+c.height = 512;
+const ctx = c.getContext('2d');
+ctx.fillStyle = '#b4bcc4';
+ctx.fillRect(0, 0, 256, 512);
+for (let y = 0; y < 512; y += 16) {
+ctx.fillStyle = y % 32 === 0 ? 'rgba(90, 102, 114, 0.22)' : 'rgba(255, 255, 255, 0.14)';
+ctx.fillRect(0, y, 256, 2);
+}
+ctx.fillStyle = 'rgba(72, 84, 96, 0.28)';
+for (let y = 8; y < 512; y += 32) {
+for (let x = 16; x < 256; x += 32) {
+ctx.beginPath();
+ctx.arc(x, y, 1.6, 0, Math.PI * 2);
+ctx.fill();
+}
+}
+const tex = new THREE.CanvasTexture(c);
+tex.wrapS = THREE.RepeatWrapping;
+tex.wrapT = THREE.RepeatWrapping;
+tex.repeat.set(3, 18);
+tex.colorSpace = THREE.SRGBColorSpace;
+return tex;
+}
+function createWaterNormalTexture() {
+const c = document.createElement('canvas');
+c.width = 256;
+c.height = 256;
+const ctx = c.getContext('2d');
+const img = ctx.createImageData(256, 256);
+for (let y = 0; y < 256; y++) {
+for (let x = 0; x < 256; x++) {
+const u = (x / 256) * Math.PI * 2;
+const v = (y / 256) * Math.PI * 2;
+const nx = Math.sin(u * 4 + Math.cos(v * 3)) * 0.22 + Math.cos(u * 9 - v * 6) * 0.12;
+const ny = Math.cos(v * 5 + Math.sin(u * 4)) * 0.22 + Math.sin(u * 7 + v * 8) * 0.12;
+const idx = (y * 256 + x) * 4;
+img.data[idx] = Math.floor((nx * 0.5 + 0.5) * 255);
+img.data[idx + 1] = Math.floor((ny * 0.5 + 0.5) * 255);
+img.data[idx + 2] = 245;
+img.data[idx + 3] = 255;
+}
+}
+ctx.putImageData(img, 0, 0);
+const tex = new THREE.CanvasTexture(c);
+tex.wrapS = THREE.RepeatWrapping;
+tex.wrapT = THREE.RepeatWrapping;
+tex.repeat.set(28, 28);
+return tex;
+}
+const concreteTex = createConcreteTexture();
+const waterNormalTex = createWaterNormalTexture();
+// Shared Architectural Materials
+const matMaterials = {
+water: new THREE.MeshStandardMaterial({
+color: 0x1b7b86,
+roughness: 0.22,
+metalness: 0.12,
+normalMap: waterNormalTex,
+normalScale: new THREE.Vector2(0.32, 0.32),
+envMapIntensity: 0.85
+}),
+harbourShallow: new THREE.MeshStandardMaterial({
+color: 0x2899a4,
+roughness: 0.35,
+metalness: 0.05,
+transparent: true,
+opacity: 0.45
+}),
+plazaWhite: new THREE.MeshStandardMaterial({
+color: 0xf4f6f9,
+roughness: 0.82,
+metalness: 0.02
+}),
+plazaStone: new THREE.MeshStandardMaterial({
+color: 0xe3e8ee,
+roughness: 0.85,
+metalness: 0.02
+}),
+roadGrey: new THREE.MeshStandardMaterial({
+color: 0xd0d7e0,
+roughness: 0.88,
+metalness: 0.0
+}),
+parkGreen: new THREE.MeshStandardMaterial({
+color: 0xb9cdc3,
+roughness: 0.9,
+metalness: 0.0
+}),
+treeCanopy: new THREE.MeshStandardMaterial({
+color: 0x8fb0a1,
+roughness: 0.82,
+flatShading: true
+}),
+treeCanopyLight: new THREE.MeshStandardMaterial({
+color: 0xa4c2b4,
+roughness: 0.82,
+flatShading: true
+}),
+cityWhite: new THREE.MeshStandardMaterial({
+color: 0xf7f9fb,
+roughness: 0.72,
+metalness: 0.04
+}),
+cityLightGrey: new THREE.MeshStandardMaterial({
+color: 0xe4e9ef,
+roughness: 0.76,
+metalness: 0.04
+}),
+cityMidGrey: new THREE.MeshStandardMaterial({
+color: 0xcfd7e0,
+roughness: 0.78,
+metalness: 0.05
+}),
+cityWindow: new THREE.MeshStandardMaterial({
+color: 0x4b6276,
+roughness: 0.28,
+metalness: 0.45
+}),
+quayWall: new THREE.MeshStandardMaterial({
+color: 0xc2ccd6,
+roughness: 0.8
+}),
+boatWhite: new THREE.MeshStandardMaterial({
+color: 0xffffff,
+roughness: 0.35
+}),
+// Turning Torso specific materials
+coreConcrete: new THREE.MeshStandardMaterial({
+map: concreteTex,
+color: 0xc8cfd6,
+roughness: 0.82,
+metalness: 0.05
+}),
+torsoCladding: new THREE.MeshStandardMaterial({
+color: 0xfbfcfd,
+roughness: 0.34,
+metalness: 0.14,
+envMapIntensity: 0.75
+}),
+torsoGlass: new THREE.MeshStandardMaterial({
+color: 0x243b4e,
+roughness: 0.14,
+metalness: 0.78,
+envMapIntensity: 1.35
+}),
+torsoGap: new THREE.MeshStandardMaterial({
+color: 0x1d2b38,
+roughness: 0.42,
+metalness: 0.65
+}),
+steelSpine: new THREE.MeshStandardMaterial({
+color: 0xffffff,
+roughness: 0.24,
+metalness: 0.38,
+envMapIntensity: 0.95
+}),
+steelJoint: new THREE.MeshStandardMaterial({
+color: 0xdce4ec,
+roughness: 0.32,
+metalness: 0.48
+})
+};
+// ============================================================================
+// ENVIRONMENT: MALMÖ VÄSTRA HAMNEN & TEAL HARBOUR
+// ============================================================================
+const cityGroup = new THREE.Group();
+scene.add(cityGroup);
+const boats = [];
+function buildEnvironment() {
+// 1. Vast Teal Sea / Öresund Harbour
+const waterGeo = new THREE.PlaneGeometry(2400, 2400);
+const waterMesh = new THREE.Mesh(waterGeo, matMaterials.water);
+waterMesh.rotation.x = -Math.PI / 2;
+waterMesh.position.y = -1.6;
+waterMesh.receiveShadow = true;
+cityGroup.add(waterMesh);
+// Subtle turquoise shallow shelf near the harbour edges
+const shallowGeo = new THREE.PlaneGeometry(520, 520);
+const shallowMesh = new THREE.Mesh(shallowGeo, matMaterials.harbourShallow);
+shallowMesh.rotation.x = -Math.PI / 2;
+shallowMesh.position.set(-40, -1.52, 40);
+cityGroup.add(shallowMesh);
+// Helper to add a landmass / island block with crisp quay walls
+function addLandMass(x, z, w, d, topY = 0, mat = matMaterials.plazaStone) {
+const h = 3.2 + topY;
+const geo = new THREE.BoxGeometry(w, h, d);
+const mesh = new THREE.Mesh(geo, mat);
+mesh.position.set(x, topY - h / 2, z);
+mesh.receiveShadow = true;
+mesh.castShadow = true;
+cityGroup.add(mesh);
+// Crisp white quay rim coping
+const rimGeo = new THREE.BoxGeometry(w + 0.6, 0.35, d + 0.6);
+const rim = new THREE.Mesh(rimGeo, matMaterials.plazaWhite);
+rim.position.set(x, topY - 0.16, z);
+rim.receiveShadow = true;
+cityGroup.add(rim);
+}
+// Main North-East Malmö Peninsula (Turning Torso sits at origin 0, 0, 0)
+// West shoreline at x = -46, South canal shoreline at z = +54
+addLandMass(230, -210, 552, 528, 0, matMaterials.plazaStone);
+// South-East Peninsula across the Västra Hamnen canal (canal from z = 54 to z = 88)
+addLandMass(240, 320, 540, 464, 0, matMaterials.plazaStone);
+// West Breakwater / Marina Promenade Pier (Bo01 style)
+addLandMass(-92, 145, 34, 210, 0, matMaterials.plazaWhite);
+addLandMass(-70, 240, 80, 26, 0, matMaterials.plazaWhite);
+// Two sleek white pedestrian/road bridges spanning the canal (z = 54..88)
+function addCanalBridge(bx) {
+const bridgeGroup = new THREE.Group();
+const deck = new THREE.Mesh(new THREE.BoxGeometry(14, 0.9, 38), matMaterials.plazaWhite);
+deck.position.set(bx, 1.1, 71);
+deck.castShadow = true;
+deck.receiveShadow = true;
+bridgeGroup.add(deck);
+const railL = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1.1, 38), matMaterials.cityLightGrey);
+railL.position.set(bx - 6.6, 2.0, 71);
+bridgeGroup.add(railL);
+const railR = railL.clone();
+railR.position.x = bx + 6.6;
+bridgeGroup.add(railR);
+cityGroup.add(bridgeGroup);
+}
+addCanalBridge(46);
+addCanalBridge(165);
+// Turning Torso Sculpted Waterfront Plaza (centered at 0,0,0)
+const plazaOuter = new THREE.Mesh(new THREE.CylinderGeometry(42, 43, 0.28, 64), matMaterials.plazaWhite);
+plazaOuter.position.set(0, 0.14, 0);
+plazaOuter.receiveShadow = true;
+cityGroup.add(plazaOuter);
+const plazaInner = new THREE.Mesh(new THREE.CylinderGeometry(29, 29.5, 0.36, 64), matMaterials.plazaStone);
+plazaInner.position.set(0, 0.18, 0);
+plazaInner.receiveShadow = true;
+cityGroup.add(plazaInner);
+// Architectural reflection water basin arc on the west side of the plaza
+const poolGeo = new THREE.RingGeometry(24, 34, 48, 1, Math.PI * 0.62, Math.PI * 0.76);
+const poolMesh = new THREE.Mesh(poolGeo, matMaterials.water);
+poolMesh.rotation.x = -Math.PI / 2;
+poolMesh.position.set(0, 0.38, 0);
+cityGroup.add(poolMesh);
+// Clean Low-Poly Road Grid
+function addRoad(x, z, w, d) {
+const r = new THREE.Mesh(new THREE.BoxGeometry(w, 0.12, d), matMaterials.roadGrey);
+r.position.set(x, 0.06, z);
+r.receiveShadow = true;
+cityGroup.add(r);
+}
+addRoad(46, -160, 14, 420);
+addRoad(165, -160, 14, 420);
+addRoad(180, -48, 440, 13);
+addRoad(180, -145, 440, 13);
+addRoad(46, 260, 14, 340);
+addRoad(165, 260, 14, 340);
+addRoad(180, 155, 440, 13);
+// Park strips & Trees
+function addPark(x, z, w, d) {
+const p = new THREE.Mesh(new THREE.BoxGeometry(w, 0.18, d), matMaterials.parkGreen);
+p.position.set(x, 0.09, z);
+p.receiveShadow = true;
+cityGroup.add(p);
+}
+addPark(-24, -85, 24, 65);
+addPark(105, 18, 62, 34);
+addPark(105, 118, 68, 28);
+addPark(-24, 150, 26, 70);
+const treeTrunkMat = new THREE.MeshStandardMaterial({ color: 0x8c857e, roughness: 0.9 });
+const trunkGeo = new THREE.CylinderGeometry(0.28, 0.38, 2.2, 6);
+const crownGeo = new THREE.IcosahedronGeometry(2.3, 1);
+function addTree(x, z, scale = 1.0, light = false) {
+const g = new THREE.Group();
+const trunk = new THREE.Mesh(trunkGeo, treeTrunkMat);
+trunk.position.y = 1.1 * scale;
+trunk.scale.setScalar(scale);
+g.add(trunk);
+const crown = new THREE.Mesh(crownGeo, light ? matMaterials.treeCanopyLight : matMaterials.treeCanopy);
+crown.position.y = 3.2 * scale;
+crown.scale.set(scale, scale * 1.15, scale);
+crown.castShadow = true;
+crown.receiveShadow = true;
+g.add(crown);
+g.position.set(x, 0.15, z);
+cityGroup.add(g);
+}
+const rand = mulberry32(2005);
+// Trees lining the waterfront promenade & plaza perimeter
+const promenadeTrees = [
+[-36, -34], [-36, -18], [-38, 18], [-36, 36], [-20, 44], [12, 44], [30, 44],
+[-26, -58], [-22, -74], [-28, -92], [-18, -108],
+[82, 12], [96, 22], [114, 14], [126, 26], [88, 28],
+[76, 112], [94, 122], [116, 114], [130, 124],
+[-22, 124], [-28, 142], [-18, 162], [-26, 178],
+[-86, 65], [-86, 95], [-86, 125], [-86, 155], [-86, 185]
+];
+promenadeTrees.forEach(([tx, tz], idx) => {
+addTree(tx, tz, 0.85 + rand() * 0.45, idx % 2 === 0);
+});
+// Low-Poly Malmö Architecture Blocks (Clean white & soft grey Nordic courtyards)
+function addBuildingBlock(x, z, w, d, h, style = 0) {
+const bGroup = new THREE.Group();
+const wallMat = style === 0
+? matMaterials.cityWhite
+: style === 1
+? matMaterials.cityLightGrey
+: matMaterials.cityMidGrey;
+const body = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), wallMat);
+body.position.y = h / 2;
+body.castShadow = true;
+body.receiveShadow = true;
+bGroup.add(body);
+// Recessed horizontal window ribbons per floor
+const floors = Math.max(2, Math.floor(h / 3.4));
+for (let f = 0; f < floors; f++) {
+const wy = 2.0 + f * 3.3;
+if (wy + 1.2 < h - 0.6) {
+const winBand = new THREE.Mesh(
+new THREE.BoxGeometry(w + 0.16, 1.15, d + 0.16),
+matMaterials.cityWindow
+);
+winBand.position.y = wy;
+bGroup.add(winBand);
+}
+}
+// Crisp architectural roof parapet or pitched Nordic roof
+if (style === 2 && w < 26 && d < 26) {
+const roofH = 3.2;
+const roofGeo = new THREE.ConeGeometry(Math.max(w, d) * 0.68, roofH, 4);
+const roof = new THREE.Mesh(roofGeo, matMaterials.cityMidGrey);
+roof.rotation.y = Math.PI / 4;
+roof.position.y = h + roofH / 2;
+roof.castShadow = true;
+bGroup.add(roof);
+} else {
+const parapet = new THREE.Mesh(
+new THREE.BoxGeometry(w + 0.4, 0.55, d + 0.4),
+matMaterials.plazaWhite
+);
+parapet.position.y = h + 0.25;
+parapet.castShadow = true;
+bGroup.add(parapet);
+}
+bGroup.position.set(x, 0, z);
+cityGroup.add(bGroup);
+}
+// Curated Scandinavian waterfront & courtyard blocks
+const buildings = [
+// North of Turning Torso (waterfront Bo01 style)
+[-22, -138, 22, 18, 14, 0],
+[-24, -172, 20, 26, 18, 1],
+[-20, -212, 24, 22, 12, 2],
+[14, -76, 28, 16, 15, 0],
+[16, -108, 24, 22, 21, 1],
+[14, -176, 26, 24, 17, 0],
+[16, -218, 26, 28, 24, 2],
+// East blocks (between 1st and 2nd avenue)
+[76, -18, 24, 34, 19, 0],
+[126, -18, 28, 34, 15, 1],
+[102, 2, 34, 14, 11, 2],
+[78, -82, 26, 30, 23, 1],
+[128, -82, 24, 30, 18, 0],
+[102, -112, 38, 16, 14, 0],
+[80, -182, 30, 32, 22, 2],
+[128, -184, 26, 36, 26, 0],
+// Further East skyline blocks
+[202, 14, 34, 42, 25, 1],
+[255, 8, 38, 36, 20, 0],
+[204, -86, 36, 38, 28, 0],
+[260, -90, 42, 40, 22, 2],
+[206, -188, 38, 44, 30, 1],
+[268, -190, 44, 42, 24, 0],
+// South across the Västra Hamnen canal
+[-16, 112, 22, 24, 14, 0],
+[16, 116, 24, 28, 18, 1],
+[-14, 186, 26, 24, 16, 2],
+[18, 192, 22, 30, 21, 0],
+[-12, 238, 28, 26, 15, 1],
+[18, 244, 24, 28, 19, 0],
+[78, 188, 28, 28, 20, 0],
+[128, 190, 26, 30, 17, 1],
+[102, 224, 42, 18, 14, 2],
+[80, 264, 30, 32, 24, 1],
+[130, 266, 28, 34, 21, 0],
+[205, 122, 36, 34, 22, 0],
+[258, 126, 38, 36, 18, 1],
+[208, 198, 40, 38, 26, 2],
+[264, 202, 42, 40, 20, 0]
+];
+buildings.forEach(([x, z, w, d, h, st]) => addBuildingBlock(x, z, w, d, h, st));
+// Marina Piers & Minimalist White Sailboats / Yachts in the Teal Harbour
+const pierMat = matMaterials.plazaWhite;
+function addPier(x, z, len, rotY = 0) {
+const g = new THREE.Group();
+const walk = new THREE.Mesh(new THREE.BoxGeometry(len, 0.35, 2.2), pierMat);
+walk.position.set(-len / 2, -1.05, 0);
+walk.castShadow = true;
+walk.receiveShadow = true;
+g.add(walk);
+for (let i = 1; i <= 3; i++) {
+const fx = -i * (len / 3.4);
+const finger = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.3, 8.5), pierMat);
+finger.position.set(fx, -1.08, 0);
+g.add(finger);
+}
+g.position.set(x, 0, z);
+g.rotation.y = rotY;
+cityGroup.add(g);
+}
+addPier(-46, -12, 26, 0);
+addPier(-46, 22, 26, 0);
+addPier(-46, -52, 24, 0);
+addPier(-75, 88, 24, Math.PI);
+addPier(-75, 132, 24, Math.PI);
+addPier(95, 54, 20, Math.PI / 2);
+function addSailboat(x, z, rotY, hasSail = false, phase = 0) {
+const bg = new THREE.Group();
+const hull = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.85, 6.4), matMaterials.boatWhite);
+hull.position.y = 0.25;
+hull.castShadow = true;
+bg.add(hull);
+const bow = new THREE.Mesh(new THREE.ConeGeometry(1.12, 2.2, 4), matMaterials.boatWhite);
+bow.rotation.x = Math.PI / 2;
+bow.rotation.y = Math.PI / 4;
+bow.scale.set(1, 1, 0.55);
+bow.position.set(0, 0.32, 4.1);
+bg.add(bow);
+const cabin = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.65, 2.5), matMaterials.cityLightGrey);
+cabin.position.set(0, 0.85, -0.3);
+bg.add(cabin);
+const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.08, 8.5, 6), matMaterials.steelSpine);
+mast.position.set(0, 4.4, 0.6);
+bg.add(mast);
+if (hasSail) {
+const sailShape = new THREE.Shape();
+sailShape.moveTo(0, 0);
+sailShape.lineTo(0, 7.2);
+sailShape.lineTo(-3.4, 0.4);
+sailShape.closePath();
+const sailGeo = new THREE.ShapeGeometry(sailShape);
+const sail = new THREE.Mesh(sailGeo, matMaterials.boatWhite);
+sail.rotation.y = Math.PI / 2;
+sail.position.set(0.08, 1.3, 0.5);
+sail.castShadow = true;
+bg.add(sail);
+}
+bg.position.set(x, -1.55, z);
+bg.rotation.y = rotY;
+cityGroup.add(bg);
+boats.push({ group: bg, baseY: -1.55, phase, rotY });
+}
+addSailboat(-55, -7, 0.2, false, 0.3);
+addSailboat(-63, -17, -0.1, false, 1.4);
+addSailboat(-56, 27, 0.15, false, 2.1);
+addSailboat(-64, 17, 0.05, false, 3.0);
+addSailboat(-55, -47, -0.12, false, 4.2);
+addSailboat(-64, 93, 3.05, false, 0.9);
+addSailboat(-62, 137, 3.2, false, 2.7);
+// Two graceful sailboats cruising in the open teal harbour
+addSailboat(-118, 25, 0.42, true, 1.1);
+addSailboat(-148, -45, 0.65, true, 3.8);
+addSailboat(112, 71, Math.PI / 2, false, 2.3);
+}
+buildEnvironment();
+// ============================================================================
+// TURNING TORSO ARCHITECTURAL MODEL (190m, 54 Floors, 9 Cubes, 90° Twist, Spine)
+// ============================================================================
+const torsoRoot = new THREE.Group();
+scene.add(torsoRoot);
+// Key real-world architectural constants (in meters)
+const TOTAL_HEIGHT = 190.0;
+const PODIUM_H = 8.0;
+const NUM_CUBES = 9;
+const FLOORS_PER_CUBE = 5;
+const CUBE_H = 16.5;       // 5 floors * 3.3m = 16.5m
+const GAP_H = 2.6;         // Recessed intermediate mechanical floor = 2.6m
+const PITCH_H = CUBE_H + GAP_H; // 19.1m per segment cycle
+const TOTAL_TWIST = Math.PI / 2; // 90 degrees total twist bottom-to-top
+const R_SPINE = 22.8;      // Radial distance of external steel spine
+// Floorplate cross-section (asymmetric rounded pentagon / teardrop pointing +X)
+function createCubeFloorShape(scale = 1.0) {
+const shape = new THREE.Shape();
+const steps = 96;
+for (let i = 0; i <= steps; i++) {
+const theta = (i / steps) * Math.PI * 2;
+const r = (
+14.0 +
+2.9 * Math.cos(theta) +
+1.35 * Math.cos(2 * theta) -
+0.65 * Math.cos(3 * theta) +
+0.22 * Math.cos(4 * theta)
+) * scale;
+const x = r * Math.cos(theta);
+const y = r * Math.sin(theta);
+if (i === 0) shape.moveTo(x, y);
+else shape.lineTo(x, y);
+}
+return shape;
+}
+const baseShape = createCubeFloorShape(1.0);
+const capShape = createCubeFloorShape(1.012);
+const glassShape = createCubeFloorShape(0.982);
+function makeExtrudedSlab(shape, height, mat) {
+const geo = new THREE.ExtrudeGeometry(shape, {
+depth: height,
+bevelEnabled: false,
+curveSegments: 48
+});
+const mesh = new THREE.Mesh(geo, mat);
+mesh.rotation.x = -Math.PI / 2;
+mesh.castShadow = true;
+mesh.receiveShadow = true;
+return mesh;
+}
+// 1. Site Foundation Ring & Ground Entrance Podium (y = 0 to 8.0m)
+const siteRing = new THREE.Mesh(
+new THREE.RingGeometry(18.5, 21.5, 64),
+new THREE.MeshBasicMaterial({ color: 0x1b8a96, side: THREE.DoubleSide, transparent: true, opacity: 0.7 })
+);
+siteRing.rotation.x = -Math.PI / 2;
+siteRing.position.y = 0.42;
+torsoRoot.add(siteRing);
+const podiumGroup = new THREE.Group();
+const podiumBase = makeExtrudedSlab(baseShape, 0.7, matMaterials.torsoCladding);
+podiumGroup.add(podiumBase);
+const podiumGlass = makeExtrudedSlab(glassShape, 6.6, matMaterials.torsoGlass);
+podiumGlass.position.y = 0.7;
+podiumGroup.add(podiumGlass);
+// Perimeter white structural columns around ground lobby
+for (let k = 0; k < 14; k++) {
+const th = (k / 14) * Math.PI * 2;
+const r = (14.0 + 2.9 * Math.cos(th) + 1.35 * Math.cos(2 * th) - 0.65 * Math.cos(3 * th) + 0.22 * Math.cos(4 * th)) * 0.995;
+const col = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.36, 7.2, 10), matMaterials.torsoCladding);
+col.position.set(r * Math.cos(th), 3.6, -r * Math.sin(th));
+col.castShadow = true;
+podiumGroup.add(col);
+}
+const podiumRoof = makeExtrudedSlab(capShape, 0.7, matMaterials.torsoCladding);
+podiumRoof.position.y = 7.3;
+podiumGroup.add(podiumRoof);
+torsoRoot.add(podiumGroup);
+// 2. Central Reinforced Concrete Core (Radius 5.3m, full height 188m)
+const coreGroup = new THREE.Group();
+const coreHeight = 188.0;
+const coreGeo = new THREE.CylinderGeometry(5.3, 5.3, coreHeight, 36);
+coreGeo.translate(0, coreHeight / 2, 0); // pivot at bottom y = 0 for clean vertical extrusion
+const coreMesh = new THREE.Mesh(coreGeo, matMaterials.coreConcrete);
+coreMesh.castShadow = true;
+coreMesh.receiveShadow = true;
+coreGroup.add(coreMesh);
+// Core top cap
+const coreCap = new THREE.Mesh(new THREE.CylinderGeometry(5.45, 5.45, 0.8, 36), matMaterials.torsoCladding);
+coreCap.position.y = coreHeight;
+coreGroup.add(coreCap);
+torsoRoot.add(coreGroup);
+// 3. The 9 Stacked Segments ("Cubes") of 5 Floors Each
+const segmentItems = [];
+function buildSegmentUnit(index) {
+const segGroup = new THREE.Group();
+// Recessed dark intermediate mechanical floor beneath cube (except cube 0 sits on podium)
+if (index > 0) {
+const gapCyl = new THREE.Mesh(
+new THREE.CylinderGeometry(10.6, 10.6, GAP_H, 32),
+matMaterials.torsoGap
+);
+gapCyl.position.y = -GAP_H / 2;
+gapCyl.castShadow = true;
+gapCyl.receiveShadow = true;
+segGroup.add(gapCyl);
+}
+// Bottom white slab cap
+const botCap = makeExtrudedSlab(capShape, 0.45, matMaterials.torsoCladding);
+segGroup.add(botCap);
+// 5 Distinct Floors inside each cube (window ribbon + white aluminum spandrel band)
+const floorStep = (CUBE_H - 0.9) / FLOORS_PER_CUBE; // 3.12m per floor
+for (let f = 0; f < FLOORS_PER_CUBE; f++) {
+const fy = 0.45 + f * floorStep;
+const winH = floorStep * 0.58;
+const spandrelH = floorStep * 0.42;
+const winMesh = makeExtrudedSlab(glassShape, winH, matMaterials.torsoGlass);
+winMesh.position.y = fy;
+segGroup.add(winMesh);
+const spanMesh = makeExtrudedSlab(baseShape, spandrelH, matMaterials.torsoCladding);
+spanMesh.position.y = fy + winH;
+segGroup.add(spanMesh);
+}
+// Subtle vertical white facade mullions for crisp architectural rhythm
+const mullionGeo = new THREE.BoxGeometry(0.24, CUBE_H - 0.4, 0.34);
+for (let m = 1; m < 18; m++) {
+const th = (m / 18) * Math.PI * 2;
+const r = (14.0 + 2.9 * Math.cos(th) + 1.35 * Math.cos(2 * th) - 0.65 * Math.cos(3 * th) + 0.22 * Math.cos(4 * th)) * 0.996;
+const mullion = new THREE.Mesh(mullionGeo, matMaterials.torsoCladding);
+mullion.position.set(r * Math.cos(th), CUBE_H / 2, -r * Math.sin(th));
+mullion.rotation.y = th;
+segGroup.add(mullion);
+}
+// Top white slab cap
+const topCap = makeExtrudedSlab(capShape, 0.45, matMaterials.torsoCladding);
+topCap.position.y = CUBE_H - 0.45;
+segGroup.add(topCap);
+return segGroup;
+}
+for (let i = 0; i < NUM_CUBES; i++) {
+const seg = buildSegmentUnit(i);
+const targetY = PODIUM_H + (i === 0 ? 0 : GAP_H) + i * PITCH_H;
+const targetAngle = (i / (NUM_CUBES - 1)) * TOTAL_TWIST; // 0 to PI/2 (90 degrees)
+seg.position.y = targetY;
+torsoRoot.add(seg);
+segmentItems.push({
+group: seg,
+index: i,
+targetY,
+targetAngle
+});
+}
+// 4. Top Crown & Observation/Sky-Lobby Floors (y = 177.3m to 190.0m)
+const crownGroup = new THREE.Group();
+const crownBaseY = PODIUM_H + GAP_H + 8 * PITCH_H + CUBE_H; // 177.3m
+crownGroup.position.y = crownBaseY;
+crownGroup.rotation.y = -TOTAL_TWIST; // aligned with top 9th cube at 90°
+const crownGap = new THREE.Mesh(new THREE.CylinderGeometry(10.4, 10.4, 2.2, 32), matMaterials.torsoGap);
+crownGap.position.y = 1.1;
+crownGroup.add(crownGap);
+const crownDeck = makeExtrudedSlab(baseShape, 3.8, matMaterials.torsoCladding);
+crownDeck.position.y = 2.2;
+crownGroup.add(crownDeck);
+const crownGlass = makeExtrudedSlab(glassShape, 2.4, matMaterials.torsoGlass);
+crownGlass.position.y = 6.0;
+crownGroup.add(crownGlass);
+const crownParapet = makeExtrudedSlab(capShape, 1.6, matMaterials.torsoCladding);
+crownParapet.position.y = 8.4;
+crownGroup.add(crownParapet);
+// Slim white architectural rooftop mast reaching exact 190.0m
+const mastHeight = TOTAL_HEIGHT - (crownBaseY + 10.0);
+const roofMast = new THREE.Mesh(
+new THREE.CylinderGeometry(0.14, 0.36, Math.max(2.7, mastHeight), 12),
+matMaterials.steelSpine
+);
+roofMast.position.set(2.0, 10.0 + mastHeight / 2, 0);
+roofMast.castShadow = true;
+crownGroup.add(roofMast);
+torsoRoot.add(crownGroup);
+// 5. External White Steel Spine & Triangular Outrigger Trusses (on the twisting prow side)
+const spineGroup = new THREE.Group();
+torsoRoot.add(spineGroup);
+function twistAngleAtHeight(y) {
+const firstCenterY = PODIUM_H + CUBE_H / 2; // 16.25m
+const lastCenterY = PODIUM_H + GAP_H + 8 * PITCH_H + CUBE_H / 2; // 169.05m
+const u = clamp((y - firstCenterY) / (lastCenterY - firstCenterY), 0, 1);
+return u * TOTAL_TWIST;
+}
+function spinePointAtY(y) {
+const th = twistAngleAtHeight(y);
+return new THREE.Vector3(R_SPINE * Math.cos(th), y, R_SPINE * Math.sin(th));
+}
+// Helical main steel spine column (built in vertical segments so it can smoothly grow upward)
+const SPINE_TOP_Y = PODIUM_H + GAP_H + 8 * PITCH_H + CUBE_H * 0.55; // ~170m
+const SPINE_SEGS = 72;
+const spineTubeSegments = [];
+function createStrutBetween(p1, p2, radius, mat) {
+const dir = new THREE.Vector3().subVectors(p2, p1);
+const len = dir.length();
+const geo = new THREE.CylinderGeometry(radius, radius, len, 12);
+const mesh = new THREE.Mesh(geo, mat);
+mesh.position.copy(p1).addScaledVector(dir, 0.5);
+mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.normalize());
+mesh.castShadow = true;
+mesh.receiveShadow = true;
+return mesh;
+}
+for (let s = 0; s < SPINE_SEGS; s++) {
+const y0 = (s / SPINE_SEGS) * SPINE_TOP_Y;
+const y1 = ((s + 1) / SPINE_SEGS) * SPINE_TOP_Y;
+const p0 = spinePointAtY(y0);
+const p1 = spinePointAtY(y1);
+const segMesh = createStrutBetween(p0, p1, 1.05, matMaterials.steelSpine);
+spineGroup.add(segMesh);
+spineTubeSegments.push({ mesh: segMesh, frac: s / SPINE_SEGS });
+}
+// Ground foundation abutment anchoring the steel spine into the plaza
+const baseSpinePt = spinePointAtY(0);
+const upperAnchorPt = spinePointAtY(9.5);
+const buttressBasePt = new THREE.Vector3(R_SPINE + 5.5, 0, 0);
+const buttressStrut = createStrutBetween(buttressBasePt, upperAnchorPt, 1.25, matMaterials.steelSpine);
+spineGroup.add(buttressStrut);
+const foundationPad = new THREE.Mesh(new THREE.BoxGeometry(10, 1.1, 6.5), matMaterials.torsoCladding);
+foundationPad.position.set(R_SPINE + 2.5, 0.55, 0);
+foundationPad.castShadow = true;
+foundationPad.receiveShadow = true;
+spineGroup.add(foundationPad);
+// 9 Triangular Outrigger Truss Assemblies (one connecting the spine to each of the 9 cubes)
+const outriggerTrusses = [];
+for (let i = 0; i < NUM_CUBES; i++) {
+const trussGroup = new THREE.Group();
+const cubeBottomY = PODIUM_H + (i === 0 ? 0 : GAP_H) + i * PITCH_H;
+const cubeMidY = cubeBottomY + CUBE_H / 2;
+const th = (i / (NUM_CUBES - 1)) * TOTAL_TWIST;
+const cosT = Math.cos(th);
+const sinT = Math.sin(th);
+const spineNode = new THREE.Vector3(R_SPINE * cosT, cubeMidY, R_SPINE * sinT);
+const prowMid = new THREE.Vector3(16.6 * cosT, cubeMidY, 16.6 * sinT);
+const prowTop = new THREE.Vector3(15.2 * cosT, cubeMidY + 7.2, 15.2 * sinT);
+const prowBot = new THREE.Vector3(15.2 * cosT, cubeMidY - 7.2, 15.2 * sinT);
+// Spherical/cylindrical steel node collar on the spine
+const joint = new THREE.Mesh(new THREE.SphereGeometry(1.42, 16, 12), matMaterials.steelJoint);
+joint.position.copy(spineNode);
+joint.castShadow = true;
+trussGroup.add(joint);
+// Heavy horizontal compression strut
+trussGroup.add(createStrutBetween(prowMid, spineNode, 0.52, matMaterials.steelSpine));
+// Upper & lower diagonal tension stays forming the iconic Calatrava triangle
+trussGroup.add(createStrutBetween(prowTop, spineNode, 0.25, matMaterials.steelSpine));
+trussGroup.add(createStrutBetween(prowBot, spineNode, 0.25, matMaterials.steelSpine));
+spineGroup.add(trussGroup);
+outriggerTrusses.push({
+group: trussGroup,
+index: i,
+node: spineNode
+});
+}
+// ============================================================================
+// 3D ARCHITECTURAL DIAGRAM OVERLAYS (90° Twist Arc + 190m Height Ruler)
+// ============================================================================
+const diagramGroup = new THREE.Group();
+scene.add(diagramGroup);
+// 1. Roof 0° -> 90° Twist Protractor Ring at y = 191.8m
+const twistArcGroup = new THREE.Group();
+twistArcGroup.position.y = 191.8;
+diagramGroup.add(twistArcGroup);
+const arcRadius = 26.5;
+const arcPts = [];
+for (let k = 0; k <= 48; k++) {
+const a = (k / 48) * (Math.PI / 2);
+arcPts.push(new THREE.Vector3(arcRadius * Math.cos(a), 0, arcRadius * Math.sin(a)));
+}
+const arcCurve = new THREE.CatmullRomCurve3(arcPts);
+const arcTube = new THREE.Mesh(
+new THREE.TubeGeometry(arcCurve, 48, 0.34, 8, false),
+new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.95 })
+);
+twistArcGroup.add(arcTube);
+// 9 segment angle tick marks along the 90° arc
+for (let i = 0; i < NUM_CUBES; i++) {
+const a = (i / (NUM_CUBES - 1)) * (Math.PI / 2);
+const tick = new THREE.Mesh(
+new THREE.BoxGeometry(i === 0 || i === 8 ? 3.2 : 1.8, 0.35, 0.45),
+new THREE.MeshBasicMaterial({ color: i === 8 ? 0x1b8a96 : 0xffffff })
+);
+tick.position.set(arcRadius * Math.cos(a), 0, arcRadius * Math.sin(a));
+tick.rotation.y = -a;
+twistArcGroup.add(tick);
+}
+// 2. Vertical 190m Architectural Dimension Ruler beside the tower
+const heightRulerGroup = new THREE.Group();
+diagramGroup.add(heightRulerGroup);
+const rulerLine = new THREE.Mesh(
+new THREE.CylinderGeometry(0.24, 0.24, 190, 8),
+new THREE.MeshBasicMaterial({ color: 0xffffff })
+);
+rulerLine.position.y = 95;
+heightRulerGroup.add(rulerLine);
+const topTick = new THREE.Mesh(new THREE.BoxGeometry(4.5, 0.45, 0.45), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+topTick.position.y = 190;
+heightRulerGroup.add(topTick);
+const botTick = topTick.clone();
+botTick.position.y = 0.5;
+heightRulerGroup.add(botTick);
+// ============================================================================
+// CALLOUT LABELS & SVG LEADER LINES
+// ============================================================================
+const CALLOUT_DEFS = [
+{
+id: 'architect',
+tag: 'DESIGN & CONCEPT',
+title: 'Santiago Calatrava',
+desc: 'Inspired by a twisting human torso',
+anchor: new THREE.Vector3(-8, 6, 8),
+side: 'left',
+boxX: 64,
+boxY: 1320,
+tIn: 0.6,
+tPeak: 1.1,
+tOutStart: 3.3,
+tOutEnd: 3.9
+},
+{
+id: 'core',
+tag: 'STRUCTURAL AXIS',
+title: 'Concrete Core',
+desc: '190 m central reinforced shaft',
+anchor: new THREE.Vector3(-4.2, 118, 2.5),
+side: 'left',
+boxX: 64,
+boxY: 740,
+tIn: 2.5,
+tPeak: 3.0,
+tOutStart: 6.1,
+tOutEnd: 6.7
+},
+{
+id: 'cubes',
+tag: 'MODULAR MASSING',
+title: '9 Stacked Cubes',
+desc: '5 floors per segment • 54 floors total',
+anchor: new THREE.Vector3(-11, 74, 9),
+side: 'left',
+boxX: 64,
+boxY: 960,
+tIn: 5.5,
+tPeak: 6.0,
+tOutStart: 10.0,
+tOutEnd: 10.6
+},
+{
+id: 'twist',
+tag: 'HELIX GEOMETRY',
+title: '90° Total Twist',
+desc: 'Rotates around core from bottom to top',
+anchor: new THREE.Vector3(-5, 168, 13),
+side: 'left',
+boxX: 64,
+boxY: 500,
+tIn: 8.7,
+tPeak: 9.2,
+tOutStart: 13.8,
+tOutEnd: 14.4
+},
+{
+id: 'spine',
+tag: 'EXOSKELETON',
+title: 'External Steel Spine',
+desc: 'White truss frame on one side',
+anchor: new THREE.Vector3(15.2, 114, 16.5),
+side: 'right',
+boxX: 646,
+boxY: 820,
+tIn: 11.2,
+tPeak: 11.7,
+tOutStart: 17.6,
+tOutEnd: 18.2
+},
+{
+id: 'specs',
+tag: 'MALMÖ LANDMARK',
+title: '190 m Tall • 54 Floors',
+desc: 'Completed in 2005',
+anchor: new THREE.Vector3(0, 189, 2),
+side: 'left',
+boxX: 64,
+boxY: 430,
+tIn: 14.7,
+tPeak: 15.2,
+tOutStart: 20.5,
+tOutEnd: 21.0
+}
+];
+const labelsLayer = document.getElementById('labels-layer');
+const leadersGroup = document.getElementById('leaders-group');
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const labelWidgets = CALLOUT_DEFS.map((def) => {
+const el = document.createElement('div');
+el.className = 'callout';
+el.style.left = def.boxX + 'px';
+el.style.top = def.boxY + 'px';
+el.style.opacity = '0';
+el.innerHTML = <div class="callout-tag">${def.tag}</div> <div class="callout-title">${def.title}</div> <div class="callout-desc">${def.desc}</div>;
+labelsLayer.appendChild(el);
+const poly = document.createElementNS(SVG_NS, 'polyline');
+poly.setAttribute('fill', 'none');
+poly.setAttribute('stroke', '#ffffff');
+poly.setAttribute('stroke-width', '3.5');
+poly.setAttribute('stroke-linecap', 'round');
+poly.setAttribute('stroke-linejoin', 'round');
+leadersGroup.appendChild(poly);
+const outerRing = document.createElementNS(SVG_NS, 'circle');
+outerRing.setAttribute('r', '13');
+outerRing.setAttribute('fill', 'rgba(27, 138, 150, 0.28)');
+outerRing.setAttribute('stroke', '#ffffff');
+outerRing.setAttribute('stroke-width', '2.5');
+leadersGroup.appendChild(outerRing);
+const innerDot = document.createElementNS(SVG_NS, 'circle');
+innerDot.setAttribute('r', '6');
+innerDot.setAttribute('fill', '#ffffff');
+leadersGroup.appendChild(innerDot);
+return { def, el, poly, outerRing, innerDot };
+});
+const headerEl = document.getElementById('header');
+const hudHeightEl = document.getElementById('hud-height');
+const hudFloorsEl = document.getElementById('hud-floors');
+const hudTwistEl = document.getElementById('hud-twist');
+const projVec = new THREE.Vector3();
+function projectToScreen(vec3) {
+projVec.copy(vec3).project(camera);
+return {
+x: (projVec.x * 0.5 + 0.5) * WIDTH,
+y: (-projVec.y * 0.5 + 0.5) * HEIGHT,
+visible: projVec.z < 1
+};
+}
+// ============================================================================
+// DETERMINISTIC FRAME RENDERER: window.renderAt(t)
+// ============================================================================
+function renderAt(tInput) {
+const t = clamp(Number(tInput) || 0, 0, window.DURATION);
+// 1. Subtle ambient life (harbour water shimmer & gently bobbing boats)
+waterNormalTex.offset.set(t * 0.014, t * 0.009);
+for (let i = 0; i < boats.length; i++) {
+const b = boats[i];
+b.group.position.y = b.baseY + Math.sin(t * 1.6 + b.phase) * 0.09;
+b.group.rotation.z = Math.sin(t * 1.3 + b.phase) * 0.025;
+}
+// 2. Title Header entrance (0.0s -> 0.85s)
+const headP = easeOutCubic(t / 0.85);
+headerEl.style.opacity = headP.toFixed(4);
+headerEl.style.transform = translate3d(0, ${(1 - headP) * -22}px, 0);
+// 3. Stage 1: Foundation Site Ring & Entrance Podium (0.0s -> 1.8s)
+const podP = easeOutCubic(clamp((t - 0.15) / 1.15, 0, 1));
+podiumGroup.visible = podP > 0.001;
+podiumGroup.scale.set(1, Math.max(0.001, podP), 1);
+siteRing.material.opacity = 0.75 * (1 - smoothstep(14.5, 16.5, t));
+// 4. Stage 2: Central Concrete Core Extrusion (1.7s -> 4.9s)
+const coreP = easeInOutCubic(clamp((t - 1.7) / 3.1, 0, 1));
+coreGroup.visible = coreP > 0.001;
+coreGroup.scale.set(1, Math.max(0.001, coreP), 1);
+// 5. Stage 3: 9 Stacked Cubes Dropping In & Twisting 0° -> 90° (4.6s -> 10.6s)
+let activeFloors = Math.round(podP * 2);
+let currentMaxTwistDeg = 0;
+for (let i = 0; i < NUM_CUBES; i++) {
+const item = segmentItems[i];
+const startT = 4.6 + i * 0.56;
+const dropP = easeOutCubic(clamp((t - startT) / 0.95, 0, 1));
+const twistP = easeInOutCubic(clamp((t - (startT + 0.18)) / 1.05, 0, 1));
+if (dropP <= 0.001) {
+item.group.visible = false;
+} else {
+item.group.visible = true;
+const dropOffset = (1 - dropP) * 34;
+item.group.position.y = item.targetY + dropOffset;
+const scaleXZ = 0.92 + 0.08 * easeOutBackSoft(dropP);
+item.group.scale.set(scaleXZ, 0.85 + 0.15 * dropP, scaleXZ);
+const angle = item.targetAngle * twistP;
+item.group.rotation.y = -angle;
+if (dropP > 0.4) {
+activeFloors += FLOORS_PER_CUBE + (i < 8 ? 1 : 0);
+}
+const deg = (angle * 180) / Math.PI;
+if (deg > currentMaxTwistDeg) currentMaxTwistDeg = deg;
+}
+}
+// 6. Stage 4: Crown & 190m Pinnacle (10.2s -> 11.6s)
+const crownP = easeOutCubic(clamp((t - 10.2) / 1.1, 0, 1));
+crownGroup.visible = crownP > 0.001;
+crownGroup.position.y = crownBaseY + (1 - crownP) * 24;
+crownGroup.scale.setScalar(0.94 + 0.06 * crownP);
+if (crownP > 0.5) activeFloors = 54;
+// 7. Stage 5: External White Steel Spine & 9 Triangular Trusses (10.6s -> 15.0s)
+const spineGrowP = easeInOutCubic(clamp((t - 10.6) / 2.6, 0, 1));
+const buttressP = easeOutCubic(clamp((t - 10.4) / 0.9, 0, 1));
+buttressStrut.visible = buttressP > 0.01;
+buttressStrut.scale.set(1, Math.max(0.01, buttressP), 1);
+foundationPad.visible = buttressP > 0.01;
+for (let s = 0; s < SPINE_SEGS; s++) {
+const seg = spineTubeSegments[s];
+const localP = clamp((spineGrowP - seg.frac) * 18, 0, 1);
+seg.mesh.visible = localP > 0.01;
+seg.mesh.scale.set(localP, 1, localP);
+}
+for (let i = 0; i < NUM_CUBES; i++) {
+const tr = outriggerTrusses[i];
+const trStart = 11.2 + i * 0.34;
+const trP = easeOutBackSoft(clamp((t - trStart) / 0.72, 0, 1));
+tr.group.visible = trP > 0.01;
+tr.group.scale.setScalar(Math.max(0.01, trP));
+}
+// 8. Architectural 3D Diagrams (90° Twist Arc & 190m Dimension Line)
+const arcVis = smoothstep(8.7, 9.4, t) * (1 - smoothstep(14.0, 14.6, t));
+twistArcGroup.visible = arcVis > 0.01;
+twistArcGroup.scale.setScalar(0.88 + 0.12 * arcVis);
+arcTube.material.opacity = 0.92 * arcVis;
+const rulerVis = smoothstep(14.7, 15.4, t);
+heightRulerGroup.visible = rulerVis > 0.01;
+heightRulerGroup.scale.set(1, Math.max(0.01, rulerVis), 1);
+// 9. Cinematic Slowly Orbiting Aerial Camera
+// Sweeps smoothly around the SE -> S -> SW quadrant so the twisting cubes & spine stay framed
+const orbitU = easeInOutCubic(t / window.DURATION);
+const azimuth = lerp(0.52, 1.98, orbitU); // ~30 deg to ~113 deg
+const radius = lerp(310, 342, Math.sin(orbitU * Math.PI * 0.85));
+const camY = lerp(86, 154, easeInOutCubic(clamp(t / 18.5, 0, 1)));
+const targetY = lerp(58, 93, easeInOutCubic(clamp(t / 16.0, 0, 1)));
+camera.position.set(
+Math.cos(azimuth) * radius,
+camY,
+Math.sin(azimuth) * radius
+);
+camera.lookAt(0, targetY, 0);
+camera.updateMatrixWorld();
+// Keep 190m ruler oriented nicely to the left side of the tower in screen view
+const perpAngle = azimuth + Math.PI / 2;
+heightRulerGroup.position.set(Math.cos(perpAngle) * 27, 0, Math.sin(perpAngle) * 27);
+heightRulerGroup.rotation.y = -azimuth;
+// 10. Render 3D Frame
+renderer.render(scene, camera);
+// 11. Update Bottom Architectural Spec HUD
+const dispHeight = Math.round(
+Math.max(
+podP * 8,
+coreP * 188,
+crownP > 0 ? 188 + crownP * 2 : 0
+)
+);
+hudHeightEl.textContent = ${dispHeight} m;
+hudFloorsEl.textContent = ${clamp(activeFloors, 0, 54)} / 54;
+hudTwistEl.textContent = ${Math.round(currentMaxTwistDeg)}°;
+// 12. Update HTML Callout Labels & SVG Leader Lines
+for (let i = 0; i < labelWidgets.length; i++) {
+const w = labelWidgets[i];
+const d = w.def;
+const fadeIn = easeOutCubic(clamp((t - d.tIn) / (d.tPeak - d.tIn), 0, 1));
+const fadeOut = 1 - smoothstep(d.tOutStart, d.tOutEnd, t);
+const alpha = fadeIn * fadeOut;
+if (alpha <= 0.005) {
+w.el.style.opacity = '0';
+w.poly.style.opacity = '0';
+w.outerRing.style.opacity = '0';
+w.innerDot.style.opacity = '0';
+continue;
+}
+const pt = projectToScreen(d.anchor);
+if (!pt.visible) {
+w.el.style.opacity = '0';
+w.poly.style.opacity = '0';
+w.outerRing.style.opacity = '0';
+w.innerDot.style.opacity = '0';
+continue;
+}
+const slideY = (1 - fadeIn) * 16;
+w.el.style.opacity = alpha.toFixed(4);
+w.el.style.transform = translate3d(0, ${slideY.toFixed(1)}px, 0);
+const boxW = w.el.offsetWidth || 350;
+const boxH = w.el.offsetHeight || 124;
+const edgeX = d.side === 'left' ? d.boxX + boxW : d.boxX;
+const edgeY = d.boxY + slideY + boxH * 0.5;
+const elbowX = d.side === 'left' ? edgeX + 34 : edgeX - 34;
+// Animated leader line draw from anchor point to callout edge
+const lineDraw = easeOutQuart(clamp((t - d.tIn) / 0.48, 0, 1));
+const p0x = pt.x;
+const p0y = pt.y;
+const p1x = lerp(p0x, elbowX, lineDraw);
+const p1y = lerp(p0y, edgeY, lineDraw);
+const p2x = lerp(p1x, edgeX, clamp((lineDraw - 0.55) / 0.45, 0, 1));
+const p2y = p1y;
+w.poly.setAttribute('points', ${p0x.toFixed(1)},${p0y.toFixed(1)} ${p1x.toFixed(1)},${p1y.toFixed(1)} ${p2x.toFixed(1)},${p2y.toFixed(1)});
+w.poly.style.opacity = alpha.toFixed(4);
+w.outerRing.setAttribute('cx', p0x.toFixed(1));
+w.outerRing.setAttribute('cy', p0y.toFixed(1));
+w.outerRing.style.opacity = alpha.toFixed(4);
+w.innerDot.setAttribute('cx', p0x.toFixed(1));
+w.innerDot.setAttribute('cy', p0y.toFixed(1));
+w.innerDot.style.opacity = alpha.toFixed(4);
+}
+}
+window.renderAt = renderAt;
+// Render initial frame at t = 0 deterministically
+renderAt(0);
+</script>
 </body>
 </html>
+
