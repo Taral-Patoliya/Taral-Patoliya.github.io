@@ -85,7 +85,7 @@ border-radius: 50%;
 background: #7ef0fa;
 }
 .location-pill {
-background: rgba(255, 255, 255, 0.86);
+background: rgba(255, 255, 255, 0.88);
 color: #2c3e47;
 font-size: 20px;
 font-weight: 700;
@@ -261,6 +261,12 @@ border-radius: 999px;
 </style>
 <script>
 window.DURATION = 20;
+window.__externalControlled = false;
+window.__queuedT = null;
+window.renderAt = function(t) {
+window.__externalControlled = true;
+window.__queuedT = t;
+};
 </script>
 <script type="importmap">
 {
@@ -369,7 +375,7 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.06;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, WIDTH / HEIGHT, 1, 1400);
-camera.position.set(-140, 210, 260);
+camera.position.set(-140, 205, 270);
 // ---------------------------------------------------------
 // Architectural Studio Lighting
 // ---------------------------------------------------------
@@ -406,7 +412,6 @@ c.height = 256;
 const ctx = c.getContext('2d');
 ctx.fillStyle = '#e5e8eb';
 ctx.fillRect(0, 0, 256, 256);
-// Subtle formwork grid lines
 ctx.strokeStyle = 'rgba(130, 140, 150, 0.16)';
 ctx.lineWidth = 1;
 for (let y = 0; y < 256; y += 32) {
@@ -421,7 +426,6 @@ ctx.moveTo(x, 0);
 ctx.lineTo(x, 256);
 ctx.stroke();
 }
-// Deterministic fine mineral speckle
 for (let i = 0; i < 1800; i++) {
 const px = Math.floor(hash2D(i, 1.3) * 256);
 const py = Math.floor(hash2D(i, 7.9) * 256);
@@ -511,7 +515,8 @@ metalness: 0.05
 const steelGateMat = new THREE.MeshStandardMaterial({
 color: 0x2b3945,
 roughness: 0.38,
-metalness: 0.65
+metalness: 0.65,
+side: THREE.DoubleSide
 });
 const steelRibMat = new THREE.MeshStandardMaterial({
 color: 0x4b5f70,
@@ -557,43 +562,33 @@ return Math.sin(z * 0.032) * 6.5;
 return Math.sin(z * 0.042) * 8.5 - z * 0.07;
 }
 function getCanalCenterX(z) {
-// Branch off reservoir on right bank around z = -14 and run forward along Vindhya hillside
 const t = clamp((z + 14) / 102, 0, 1);
 return 45.5 + Math.sin(t * Math.PI * 0.85) * 6.5 + t * 5.0;
 }
 function getTerrainHeight(x, z) {
 const rcx = getRiverCenterX(z);
 const distRiver = Math.abs(x - rcx);
-// Base canyon walls rising from river bed (-3.8) to flanking plateaus (+14)
 const canyonT = smoothstep(8.5, 34.0, distRiver);
 let h = lerp(-3.8, 13.8, canyonT);
-// Sculpted Satpura hills (left, x < -22) & Vindhya hills (right, x > +22)
 const hillMask = smoothstep(23.0, 46.0, distRiver);
 const ridge1 = Math.sin(x * 0.055 + 0.6) * Math.cos(z * 0.048 - 0.3) * 9.5;
 const ridge2 = Math.sin(x * 0.11 - z * 0.085) * 4.2;
 const ridge3 = Math.cos(x * 0.18 + z * 0.16) * 1.8;
 const peakBoost = smoothstep(32.0, 74.0, Math.abs(x)) * 8.5;
-// Keep upstream basin slightly deeper so reservoir spreads naturally
 const upstreamBasin = z < -4 ? smoothstep(-4, -55, z) * (1 - smoothstep(16, 48, distRiver)) * 4.5 : 0;
 h += hillMask * (ridge1 + ridge2 + ridge3 + peakBoost) - upstreamBasin;
-// Carve Narmada Main Canal terrace on right bank (z >= -16)
 if (z >= -18) {
 const ccx = getCanalCenterX(z);
 const distCanal = Math.abs(x - ccx);
 const canalBench = 1 - smoothstep(3.2, 8.5, distCanal);
 const canalTrench = 1 - smoothstep(1.6, 3.3, distCanal);
-const targetBenchY = 10.6;
-const targetBedY = 8.4;
-h = lerp(h, targetBenchY, canalBench * 0.92);
-h = lerp(h, targetBedY, canalTrench);
+h = lerp(h, 10.6, canalBench * 0.92);
+h = lerp(h, 8.4, canalTrench);
 }
-// Carve clean architectural cutaway pocket on lower-right front for Underground Powerhouse
-// x in [35, 62], z in [-3, 22]
 if (x >= 35.0 && x <= 62.0 && z >= -3.0 && z <= 22.0) {
 const edgeX = Math.min(smoothstep(35.0, 36.5, x), 1 - smoothstep(60.5, 62.0, x));
 const edgeZ = Math.min(smoothstep(-3.0, -1.5, z), 1 - smoothstep(20.5, 22.0, z));
-const cutMask = edgeX * edgeZ;
-h = lerp(h, -4.8, cutMask);
+h = lerp(h, -4.8, edgeX * edgeZ);
 }
 return h;
 }
@@ -675,7 +670,6 @@ const terrainMesh = new THREE.Mesh(nonIndexed, terrainMat);
 terrainMesh.receiveShadow = true;
 terrainMesh.castShadow = true;
 group.add(terrainMesh);
-// Solid Stratified Geological Cross-Section Skirt around the 4 diorama sides
 const baseBottomY = -10.8;
 const skirtGeo = new THREE.BufferGeometry();
 const skirtVerts = [];
@@ -688,14 +682,12 @@ const y0 = getTerrainHeight(x0, z0);
 const y1 = getTerrainHeight(x1, z1);
 const midY = (y0 + y1) * 0.5;
 const topCol = midY > 11 ? strataTop : strataMid;
-// Triangle 1
 skirtVerts.push(x0, y0, z0, x0, baseBottomY, z0, x1, y1, z1);
 skirtCols.push(
 topCol.r, topCol.g, topCol.b,
 strataDeep.r, strataDeep.g, strataDeep.b,
 topCol.r, topCol.g, topCol.b
 );
-// Triangle 2
 skirtVerts.push(x1, y1, z1, x0, baseBottomY, z0, x1, baseBottomY, z1);
 skirtCols.push(
 topCol.r, topCol.g, topCol.b,
@@ -705,19 +697,15 @@ strataDeep.r, strataDeep.g, strataDeep.b
 }
 const stepX = (maxX - minX) / segX;
 const stepZ = (maxZ - minZ) / segZ;
-// Front edge (z = maxZ)
 for (let i = 0; i < segX; i++) {
 addSkirtQuad(minX + i * stepX, maxZ, minX + (i + 1) * stepX, maxZ);
 }
-// Back edge (z = minZ)
 for (let i = 0; i < segX; i++) {
 addSkirtQuad(minX + (i + 1) * stepX, minZ, minX + i * stepX, minZ);
 }
-// Left edge (x = minX)
 for (let j = 0; j < segZ; j++) {
 addSkirtQuad(minX, minZ + j * stepZ, minX, minZ + (j + 1) * stepZ);
 }
-// Right edge (x = maxX)
 for (let j = 0; j < segZ; j++) {
 addSkirtQuad(maxX, minZ + (j + 1) * stepZ, maxX, minZ + j * stepZ);
 }
@@ -733,7 +721,6 @@ flatShading: true
 const skirtMesh = new THREE.Mesh(skirtGeo, skirtMat);
 skirtMesh.receiveShadow = true;
 group.add(skirtMesh);
-// Crisp Dark Architectural Plinth Slab
 const plinth = new THREE.Mesh(
 new THREE.BoxGeometry(154.4, 2.0, 178.4),
 new THREE.MeshStandardMaterial({
@@ -745,7 +732,6 @@ metalness: 0.15
 plinth.position.set(0, -11.8, 0);
 plinth.receiveShadow = true;
 group.add(plinth);
-// Fine warm brass/stone trim line on plinth
 const plinthTrim = new THREE.Mesh(
 new THREE.BoxGeometry(155.0, 0.35, 179.0),
 new THREE.MeshStandardMaterial({
@@ -783,7 +769,6 @@ targetY: -3.5,
 delay: Math.abs(bx) / 60 * 0.55
 });
 }
-// Stilling basin concrete apron & energy-dissipation training walls
 const stillingBasin = new THREE.Group();
 const basinFloor = new THREE.Mesh(
 new THREE.BoxGeometry(68, 1.4, 13.5),
@@ -792,7 +777,6 @@ concreteTrimMat
 basinFloor.position.set(0, -3.1, 21.5);
 basinFloor.receiveShadow = true;
 stillingBasin.add(basinFloor);
-// Training walls left & right of stilling basin
 [-33.6, 33.6].forEach((wx) => {
 const wall = new THREE.Mesh(
 new THREE.BoxGeometry(1.1, 5.2, 14.5),
@@ -803,7 +787,6 @@ wall.castShadow = true;
 wall.receiveShadow = true;
 stillingBasin.add(wall);
 });
-// Baffle blocks inside stilling basin
 for (let i = 0; i < 15; i++) {
 const bx = -28 + i * 4.0;
 const baffle = new THREE.Mesh(
@@ -821,59 +804,41 @@ foundationGroup.add(stillingBasin);
 const monolithsGroup = new THREE.Group();
 diorama.add(monolithsGroup);
 function createSpillwaySectionGeometry(width) {
-// Cross-section in (z, y) extruded along X, then rotated so X is span
 const s = new THREE.Shape();
 s.moveTo(0.0, -3.2);
 s.lineTo(0.0, 10.25);
-// Smooth Ogee Crest curve
-s.quadraticCurveTo(0.55, 10.58, 1.45, 9.75);
-// Sloped downstream spillway face
-s.lineTo(13.2, -1.6);
-// Curved ski-jump / roller bucket toe
-s.quadraticCurveTo(14.6, -2.35, 15.8, -1.45);
-s.lineTo(15.8, -3.2);
+s.quadraticCurveTo(-0.55, 10.58, -1.45, 9.75);
+s.lineTo(-13.2, -1.6);
+s.quadraticCurveTo(-14.6, -2.35, -15.8, -1.45);
+s.lineTo(-15.8, -3.2);
 s.closePath();
 const geom = new THREE.ExtrudeGeometry(s, {
 depth: width,
 bevelEnabled: false,
 curveSegments: 12
 });
-// Extrude is along +Z; rotate Y by +PI/2 so shape X -> -Z, shape Y -> +Y, extrude Z -> +X
-// Let's map explicitly via vertex transform for crystal-clear coordinates:
-// Shape (sx, sy) -> World (x = sz - width/2, y = sy, z = sx)
-const pos = geom.attributes.position;
-for (let i = 0; i < pos.count; i++) {
-const sx = pos.getX(i);
-const sy = pos.getY(i);
-const sz = pos.getZ(i);
-pos.setXYZ(i, sz - width * 0.5, sy, sx);
-}
+geom.rotateY(Math.PI / 2);
+geom.translate(-width * 0.5, 0, 0);
 geom.computeVertexNormals();
 return geom;
 }
 function createNonOverflowSectionGeometry(width) {
 const s = new THREE.Shape();
-s.moveTo(-0.4, -3.2);
+s.moveTo(0.4, -3.2);
 s.lineTo(0.0, 13.1);
-s.lineTo(2.1, 13.1);
-s.lineTo(15.2, -3.2);
+s.lineTo(-2.1, 13.1);
+s.lineTo(-15.2, -3.2);
 s.closePath();
 const geom = new THREE.ExtrudeGeometry(s, {
 depth: width,
 bevelEnabled: false
 });
-const pos = geom.attributes.position;
-for (let i = 0; i < pos.count; i++) {
-const sx = pos.getX(i);
-const sy = pos.getY(i);
-const sz = pos.getZ(i);
-pos.setXYZ(i, sz - width * 0.5, sy, sx);
-}
+geom.rotateY(Math.PI / 2);
+geom.translate(-width * 0.5, 0, 0);
 geom.computeVertexNormals();
 return geom;
 }
 const monolithItems = [];
-// Left Non-Overflow Gravity Monoliths (x = -60.5 to -33.2)
 const leftCount = 6;
 const leftStart = -60.5;
 const leftEnd = -33.2;
@@ -892,7 +857,6 @@ targetY: 0,
 order: i * 0.045
 });
 }
-// Central Spillway Gravity Monoliths (x = -33.2 to +33.2) -> 15 monolith pairs covering 30 gate bays
 const centerCount = 15;
 const centerSpan = 66.4;
 const centerW = centerSpan / centerCount;
@@ -910,7 +874,6 @@ targetY: 0,
 order: 0.25 + (1 - Math.abs(cx) / 34) * 0.35
 });
 }
-// Right Non-Overflow Gravity Monoliths (x = +33.2 to +60.5)
 const rightCount = 6;
 const rightStart = 33.2;
 const rightEnd = 60.5;
@@ -937,7 +900,7 @@ diorama.add(piersAndDeckGroup);
 const NUM_GATES = 30;
 const spillwayLeft = -33.0;
 const spillwayRight = 33.0;
-const bayPitch = (spillwayRight - spillwayLeft) / NUM_GATES; // 2.2 units per bay
+const bayPitch = (spillwayRight - spillwayLeft) / NUM_GATES;
 const pierGeom = new THREE.BoxGeometry(0.42, 4.4, 6.2);
 for (let p = 0; p <= NUM_GATES; p++) {
 const px = spillwayLeft + p * bayPitch;
@@ -947,7 +910,6 @@ pier.castShadow = true;
 pier.receiveShadow = true;
 piersAndDeckGroup.add(pier);
 }
-// Full 1,210 m Crest Roadway Deck & Parapet Walls
 const crestDeck = new THREE.Mesh(
 new THREE.BoxGeometry(121.0, 0.55, 2.6),
 concreteMat
@@ -956,7 +918,6 @@ crestDeck.position.set(0, 13.7, 1.3);
 crestDeck.castShadow = true;
 crestDeck.receiveShadow = true;
 piersAndDeckGroup.add(crestDeck);
-// Upstream & Downstream Parapet Rails + Architectural Streetlight Poles
 [-0.1, 2.5].forEach((pz) => {
 const parapet = new THREE.Mesh(
 new THREE.BoxGeometry(121.0, 0.42, 0.18),
@@ -982,10 +943,9 @@ piersAndDeckGroup.add(bulb);
 const gatesGroup = new THREE.Group();
 diorama.add(gatesGroup);
 const radialGates = [];
-const gateWidth = bayPitch - 0.46; // 1.74 units
+const gateWidth = bayPitch - 0.46;
 const gateRadius = 2.75;
-const gateArc = 0.78; // radians (~45 deg)
-// Curved cylindrical skinplate arc facing upstream (-Z) from trunnion pivot
+const gateArc = 0.78;
 const skinGeom = new THREE.CylinderGeometry(
 gateRadius,
 gateRadius,
@@ -1000,16 +960,12 @@ skinGeom.rotateZ(Math.PI / 2);
 const armGeom = new THREE.BoxGeometry(0.1, 0.18, gateRadius - 0.1);
 for (let g = 0; g < NUM_GATES; g++) {
 const gx = spillwayLeft + (g + 0.5) * bayPitch;
-// Trunnion pivot sits downstream on pier at (gx, 11.65, 3.1)
 const gatePivot = new THREE.Group();
 gatePivot.position.set(gx, 11.65, 3.1);
 const skin = new THREE.Mesh(skinGeom, steelGateMat);
-skin.material = steelGateMat.clone();
-skin.material.side = THREE.DoubleSide;
 skin.castShadow = true;
 skin.receiveShadow = true;
 gatePivot.add(skin);
-// Horizontal structural ribs across outer face of radial gate
 [-0.55, 0.0, 0.55].forEach((ry) => {
 const rib = new THREE.Mesh(
 new THREE.BoxGeometry(gateWidth, 0.14, 0.22),
@@ -1018,7 +974,6 @@ steelRibMat
 rib.position.set(0, ry - 0.35, -gateRadius + 0.08);
 gatePivot.add(rib);
 });
-// Left & right radial trunnion arms
 [-gateWidth * 0.44, gateWidth * 0.44].forEach((ax) => {
 const upperArm = new THREE.Mesh(armGeom, steelRibMat);
 upperArm.position.set(ax, 0.15, -gateRadius * 0.5);
@@ -1043,7 +998,6 @@ index: g
 // ---------------------------------------------------------
 const powerhouseGroup = new THREE.Group();
 diorama.add(powerhouseGroup);
-// Cutaway Architectural Retaining Walls framing the underground cavern
 const cavernFrameMat = new THREE.MeshStandardMaterial({
 color: 0xd9dfe4,
 roughness: 0.65
@@ -1056,7 +1010,6 @@ const cavernSideWall = new THREE.Mesh(new THREE.BoxGeometry(1.2, 11.5, 19.5), ca
 cavernSideWall.position.set(36.0, 0.6, 11.4);
 cavernSideWall.receiveShadow = true;
 powerhouseGroup.add(cavernSideWall);
-// Vaulted Underground Machine Hall Roof Arch (Cutaway front so turbines are clearly visible!)
 const vaultRoof = new THREE.Mesh(
 new THREE.CylinderGeometry(6.2, 6.2, 23.8, 16, 1, true, 0, Math.PI),
 new THREE.MeshStandardMaterial({
@@ -1068,7 +1021,6 @@ side: THREE.DoubleSide
 vaultRoof.rotation.z = Math.PI / 2;
 vaultRoof.position.set(48.0, 4.4, 8.2);
 powerhouseGroup.add(vaultRoof);
-// Warm Architectural Ceiling Light Strip inside Underground Cavern
 const ceilingStrip = new THREE.Mesh(
 new THREE.BoxGeometry(22.0, 0.25, 0.8),
 new THREE.MeshStandardMaterial({
@@ -1079,7 +1031,6 @@ emissiveIntensity: 1.5
 );
 ceilingStrip.position.set(48.0, 9.8, 8.2);
 powerhouseGroup.add(ceilingStrip);
-// Machine Hall Floor Deck
 const machineFloor = new THREE.Mesh(
 new THREE.BoxGeometry(24.2, 1.2, 17.5),
 concreteTrimMat
@@ -1087,7 +1038,6 @@ concreteTrimMat
 machineFloor.position.set(48.0, -3.6, 10.6);
 machineFloor.receiveShadow = true;
 powerhouseGroup.add(machineFloor);
-// 6 Inclined Penstocks + 6 Vertical Francis Turbine-Generator Units (1,200 MW River Bed Powerhouse)
 const penstockMat = new THREE.MeshStandardMaterial({
 color: 0x3b4956,
 roughness: 0.4,
@@ -1096,7 +1046,6 @@ metalness: 0.65
 const turbineUnits = [];
 for (let u = 0; u < 6; u++) {
 const ux = 38.6 + u * 3.75;
-// Inclined Penstock Pipe descending from upstream intake into turbine scroll case
 const penstock = new THREE.Mesh(
 new THREE.CylinderGeometry(0.68, 0.68, 13.5, 12),
 penstockMat
@@ -1105,10 +1054,8 @@ penstock.position.set(ux, 3.2, 1.4);
 penstock.rotation.x = 0.68;
 penstock.castShadow = true;
 powerhouseGroup.add(penstock);
-// Turbine-Generator Assembly
 const unitGroup = new THREE.Group();
 unitGroup.position.set(ux, -1.6, 8.2);
-// Lower spiral casing
 const spiral = new THREE.Mesh(
 new THREE.TorusGeometry(1.05, 0.45, 8, 16),
 penstockMat
@@ -1116,7 +1063,6 @@ penstockMat
 spiral.rotation.x = Math.PI / 2;
 spiral.position.y = -0.6;
 unitGroup.add(spiral);
-// Generator stator housing
 const stator = new THREE.Mesh(
 new THREE.CylinderGeometry(1.22, 1.28, 2.1, 16),
 turbineBlueMat
@@ -1124,14 +1070,12 @@ turbineBlueMat
 stator.position.y = 0.85;
 stator.castShadow = true;
 unitGroup.add(stator);
-// Spinning Exciter / Rotor Cap on top
 const rotor = new THREE.Mesh(
 new THREE.CylinderGeometry(0.75, 0.85, 0.65, 8),
 turbineGoldMat
 );
 rotor.position.y = 2.15;
 unitGroup.add(rotor);
-// Tailrace outlet pipe exiting toward downstream river
 const tailrace = new THREE.Mesh(
 new THREE.CylinderGeometry(0.55, 0.62, 9.5, 10),
 penstockMat
@@ -1148,7 +1092,7 @@ targetY: -1.6,
 index: u
 });
 }
-// Canal Head Powerhouse (250 MW) at Narmada Main Canal Intake (x = 46, z = -12)
+// Canal Head Powerhouse (250 MW)
 const chphGroup = new THREE.Group();
 const chphHall = new THREE.Mesh(
 new THREE.BoxGeometry(9.6, 4.6, 6.2),
@@ -1174,8 +1118,6 @@ const zStart = -15.0;
 const zEnd = 87.8;
 const verts = [];
 const indices = [];
-// Cross-section profile relative to canal center x:
-// Left bank lip (-3.6, 10.6), left bottom (-1.8, 8.45), right bottom (+1.8, 8.45), right bank lip (+3.6, 10.6)
 const prof = [
 [-3.6, 10.65],
 [-1.8, 8.45],
@@ -1231,7 +1173,6 @@ metalness: 0.12,
 transparent: true,
 opacity: 0.93
 });
-// Upstream reservoir volume (z = -87.8 to z = -0.05, x = -75.8 to +75.8)
 const reservoirBox = new THREE.Mesh(
 new THREE.BoxGeometry(151.6, 15.5, 87.75),
 reservoirMat
@@ -1239,7 +1180,6 @@ reservoirMat
 reservoirBox.position.set(0, -10.0, -43.92);
 reservoirBox.receiveShadow = true;
 waterGroup.add(reservoirBox);
-// Narmada Main Canal Flowing Water Ribbon
 function buildCanalWaterMesh() {
 const segs = 64;
 const zStart = -14.5;
@@ -1282,7 +1222,6 @@ return new THREE.Mesh(geom, mat);
 }
 const canalWaterMesh = buildCanalWaterMesh();
 waterGroup.add(canalWaterMesh);
-// Downstream Winding Narmada River Surface (z = 16.0 to z = 87.8)
 function buildDownstreamRiverMesh() {
 const segs = 56;
 const zStart = 15.5;
@@ -1326,7 +1265,6 @@ return new THREE.Mesh(geom, mat);
 }
 const downstreamRiverMesh = buildDownstreamRiverMesh();
 waterGroup.add(downstreamRiverMesh);
-// 30 Spillway Waterfall Sheets (hugging the exact ogee + downstream slope)
 function createCascadeSheetGeometry(width) {
 const pts = [
 [0.45, 10.65],
@@ -1382,7 +1320,6 @@ sheet.visible = false;
 waterGroup.add(sheet);
 cascadeSheets.push(sheet);
 }
-// Hydraulic-Jump Stilling Basin Foam Plumes
 const foamPlumes = [];
 const foamMat = new THREE.MeshStandardMaterial({
 color: 0xffffff,
@@ -1417,7 +1354,6 @@ color: 0xd48324,
 transparent: true,
 opacity: 0
 });
-// Vertical 163 m bar beside right spillway training wall
 const heightBar = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 16.3, 8), dimMat);
 heightBar.position.set(-34.6, 4.95, 1.2);
 dimGroup.add(heightBar);
@@ -1427,7 +1363,6 @@ dimGroup.add(heightTickTop);
 const heightTickBot = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.25, 0.25), dimMat);
 heightTickBot.position.set(-34.6, -3.2, 1.2);
 dimGroup.add(heightTickBot);
-// Horizontal 1,210 m bar above dam crest
 const spanBar = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 121.0, 8), dimMat);
 spanBar.rotation.z = Math.PI / 2;
 spanBar.position.set(0, 16.4, 1.1);
@@ -1455,8 +1390,8 @@ accent: '',
 anchor: new THREE.Vector3(-48, 22, -26),
 offsetX: -120,
 offsetY: -220,
-tIn: [0.9, 1.5],
-tOut: [4.5, 5.1]
+tIn: [0.6, 1.2],
+tOut: [4.4, 5.0]
 },
 {
 id: 'foundation',
@@ -1467,8 +1402,8 @@ accent: 'accent-gold',
 anchor: new THREE.Vector3(-8, -2.5, 11),
 offsetX: -190,
 offsetY: 220,
-tIn: [1.6, 2.2],
-tOut: [4.8, 5.4]
+tIn: [1.3, 1.9],
+tOut: [4.7, 5.3]
 },
 {
 id: 'height',
@@ -1479,7 +1414,7 @@ accent: 'accent-gold',
 anchor: new THREE.Vector3(-34.6, 7.5, 1.2),
 offsetX: -210,
 offsetY: -245,
-tIn: [3.9, 4.5],
+tIn: [3.8, 4.4],
 tOut: [8.8, 9.4]
 },
 {
@@ -1491,7 +1426,7 @@ accent: '',
 anchor: new THREE.Vector3(24, 15.8, 1.1),
 offsetX: 95,
 offsetY: -275,
-tIn: [4.5, 5.1],
+tIn: [4.4, 5.0],
 tOut: [9.2, 9.8]
 },
 {
@@ -1503,7 +1438,7 @@ accent: 'accent-blue',
 anchor: new THREE.Vector3(-4, 12.2, 1.8),
 offsetX: -175,
 offsetY: -265,
-tIn: [7.2, 7.8],
+tIn: [7.1, 7.7],
 tOut: [12.3, 12.9]
 },
 {
@@ -1515,7 +1450,7 @@ accent: 'accent-gold',
 anchor: new THREE.Vector3(47, 1.5, 9.5),
 offsetX: 60,
 offsetY: 235,
-tIn: [10.2, 10.8],
+tIn: [10.1, 10.7],
 tOut: [15.5, 16.1]
 },
 {
@@ -1527,7 +1462,7 @@ accent: '',
 anchor: new THREE.Vector3(-24, 10.5, -42),
 offsetX: -195,
 offsetY: -245,
-tIn: [13.2, 13.8],
+tIn: [13.1, 13.7],
 tOut: [16.5, 17.1]
 },
 {
@@ -1539,7 +1474,7 @@ accent: 'accent-blue',
 anchor: new THREE.Vector3(53, 10.0, 46),
 offsetX: 55,
 offsetY: 225,
-tIn: [14.3, 14.9],
+tIn: [14.2, 14.8],
 tOut: [19.4, 20.0]
 }
 ];
@@ -1584,12 +1519,12 @@ y: (-p.y * 0.5 + 0.5) * HEIGHT
 };
 }
 // ---------------------------------------------------------
-// 10. Deterministic Frame Renderer: window.renderAt(t)
+// 10. Deterministic Frame Renderer
 // ---------------------------------------------------------
-const _camTarget = new THREE.Vector3(0, 3.0, 2.0);
-window.renderAt = function renderAt(rawT) {
+const _camTarget = new THREE.Vector3(0, 3.5, 1.0);
+function renderFrame(rawT) {
 const t = clamp(Number(rawT) || 0, 0, window.DURATION);
-// --- Timeline Bar & Stage Highlight ---
+// Timeline Bar & Stage Highlight
 progressFill.style.width = ${(t / window.DURATION) * 100}%;
 const activeStage =
 t < 3.0 ? 0 :
@@ -1601,85 +1536,70 @@ stageLabelEls.forEach((span, idx) => {
 if (idx === activeStage) span.classList.add('active');
 else span.classList.remove('active');
 });
-// --- Act 1: Diorama Plinth & Gorge Emergence (0.0s - 1.4s) ---
-const dioramaEnter = easeOutCubic(t / 1.35);
-diorama.position.y = lerp(-24, 0, dioramaEnter);
-const sScale = lerp(0.92, 1.0, dioramaEnter);
-diorama.scale.set(sScale, sScale, sScale);
-// Foundation trench blocks drop in (1.2s - 2.8s)
+// Foundation trench blocks drop in (1.0s - 2.6s)
 foundationBlocks.forEach((fb) => {
-const p = easeOutCubic((t - (1.2 + fb.delay)) / 0.85);
+const p = easeOutCubic((t - (1.0 + fb.delay)) / 0.85);
 fb.mesh.visible = p > 0.001;
 fb.mesh.position.y = lerp(fb.targetY + 14, fb.targetY, p);
 });
-const basinP = easeOutCubic((t - 2.1) / 0.9);
+const basinP = easeOutCubic((t - 1.9) / 0.9);
 stillingBasin.visible = basinP > 0.001;
 stillingBasin.position.y = lerp(12, 0, basinP);
-// --- Act 2: Concrete Gravity Dam Monoliths Assemble (3.0s - 6.2s) ---
+// Act 2: Concrete Gravity Dam Monoliths Assemble (2.9s - 6.1s)
 monolithItems.forEach((item) => {
-const startT = 3.0 + item.order * 2.1;
+const startT = 2.9 + item.order * 2.1;
 const p = easeOutCubic((t - startT) / 0.95);
 item.mesh.visible = p > 0.001;
 item.mesh.position.y = lerp(24, item.targetY, p);
 });
 // 3D Dimension lines (163 m & 1,210 m)
-const dimOpacity = windowPulse(t, 4.0, 4.6, 8.9, 9.6);
+const dimOpacity = windowPulse(t, 3.9, 4.5, 8.9, 9.6);
 dimMat.opacity = dimOpacity;
 dimGroup.visible = dimOpacity > 0.01;
-heightBar.scale.y = easeOutCubic((t - 3.9) / 0.7) || 0.001;
-spanBar.scale.y = easeOutCubic((t - 4.4) / 0.7) || 0.001;
-// --- Act 3: Spillway Piers, Crest Deck & 30 Radial Gates (6.0s - 9.4s) ---
-const piersP = easeOutCubic((t - 5.9) / 0.9);
+heightBar.scale.y = easeOutCubic((t - 3.8) / 0.7) || 0.001;
+spanBar.scale.y = easeOutCubic((t - 4.3) / 0.7) || 0.001;
+// Act 3: Spillway Piers, Crest Deck & 30 Radial Gates (5.9s - 9.3s)
+const piersP = easeOutCubic((t - 5.8) / 0.9);
 piersAndDeckGroup.visible = piersP > 0.001;
 piersAndDeckGroup.position.y = lerp(18, 0, piersP);
-// Open angle for Act 6 spillway discharge (16.2s - 17.8s)
 const spillwayOpenP = easeInOutCubic((t - 16.2) / 1.5);
 radialGates.forEach((g) => {
-const installStart = 6.7 + (g.index / NUM_GATES) * 1.9;
+const installStart = 6.6 + (g.index / NUM_GATES) * 1.9;
 const installP = easeOutCubic((t - installStart) / 0.65);
 g.pivot.visible = installP > 0.001;
 g.pivot.position.y = lerp(g.baseY + 14, g.baseY, installP);
-// Rotate radial gate upward around trunnion X axis when spillway opens
 g.pivot.rotation.x = -spillwayOpenP * 0.62;
 });
-// --- Act 4: Underground Hydroelectric Powerhouses (9.8s - 12.8s) ---
-const phP = easeOutCubic((t - 9.8) / 1.1);
+// Act 4: Underground Hydroelectric Powerhouses (9.7s - 12.7s)
+const phP = easeOutCubic((t - 9.7) / 1.1);
 powerhouseGroup.visible = phP > 0.001;
 cavernLight.intensity = phP * (2.6 + Math.sin(t * 4.0) * 0.25);
 turbineUnits.forEach((u) => {
-const uStart = 10.1 + u.index * 0.28;
+const uStart = 10.0 + u.index * 0.28;
 const up = easeOutCubic((t - uStart) / 0.85);
 u.group.visible = up > 0.001;
 u.group.position.y = lerp(u.targetY + 11, u.targetY, up);
 u.penstock.visible = up > 0.05;
 u.penstock.scale.y = clamp(up * 1.15, 0.01, 1);
-// Deterministic turbine rotor spin once operational
-const spinFactor = smoothstep(11.5, 13.0, t);
+const spinFactor = smoothstep(11.4, 12.9, t);
 u.rotor.rotation.y = t * 7.5 * spinFactor + u.index * 0.5;
 });
-const chphP = easeOutCubic((t - 11.2) / 0.9);
+const chphP = easeOutCubic((t - 11.1) / 0.9);
 chphGroup.visible = chphP > 0.001;
 chphGroup.position.y = lerp(12, 0, chphP);
-// --- Act 5 & 6: Water Filling, Narmada Main Canal & Spillway Cascades ---
-// Animated water normal & foam scroll
+// Act 5 & 6: Water Filling, Narmada Main Canal & Spillway Cascades
 waterNormalTex.offset.set(t * 0.028, -t * 0.052);
 cascadeTex.offset.set(0, -t * 1.45);
-// Base river water present from beginning, rising slightly when spillway opens
 const riverRise = spillwayOpenP * 0.75;
 downstreamRiverMesh.position.y = riverRise;
 downstreamRiverMesh.scale.x = 1 + spillwayOpenP * 0.14;
-// Upstream Reservoir rises behind the dam (12.8s - 15.6s)
 const resFillP = easeInOutCubic((t - 12.8) / 2.6);
-// Reservoir box height is 15.5; center y = -10.0 puts top at -2.25 (base river bed),
-// rising to center y = +3.35 which puts top surface at y = +11.10 (against closed gates!)
 const topWaterY = lerp(-2.25, 11.15, resFillP) - spillwayOpenP * 0.25;
 reservoirBox.position.y = topWaterY - 15.5 * 0.5;
-// Narmada Main Canal fills & flows once reservoir reaches canal intake level (14.2s - 15.5s)
 const canalFillP = easeOutCubic((t - 14.2) / 1.2);
 canalWaterMesh.visible = canalFillP > 0.01;
 canalWaterMesh.position.y = lerp(-1.45, 0.0, canalFillP);
 canalWaterMesh.material.opacity = canalFillP * 0.94;
-// 30 Spillway Waterfall Sheets & Stilling Basin Foam (16.35s - 20.0s)
 const cascadeP = easeOutCubic((t - 16.35) / 0.85);
 cascadeSheets.forEach((sheet, idx) => {
 sheet.visible = cascadeP > 0.01;
@@ -1698,11 +1618,7 @@ fp.mesh.scale.set(1.45 * s, 0.62 * s, 1.35 * s);
 fp.mesh.rotation.y = t * 1.8 + fp.phase;
 }
 });
-// --- Cinematic Slowly Orbiting Aerial Camera ---
-// Smooth continuous arc across 20s:
-// Starts downstream-left (-0.52 rad), sweeps across center (0 rad),
-// swings to downstream-right (+0.62 rad) to showcase underground powerhouse & canal,
-// then settles to heroic aerial angle (+0.26 rad).
+// Cinematic Slowly Orbiting Aerial Camera
 let azimuth;
 if (t < 10.0) {
 azimuth = lerp(-0.52, 0.18, easeInOutCubic(t / 10.0));
@@ -1724,10 +1640,9 @@ Math.sin(azimuth) * radius,
 camY,
 Math.cos(azimuth) * radius
 );
-_camTarget.set(0, 3.5, 1.0);
 camera.lookAt(_camTarget);
 camera.updateMatrixWorld();
-// --- Update Projected Callout Cards & SVG Leader Lines ---
+// Update Projected Callout Cards & SVG Leader Lines
 calloutNodes.forEach(({ def, el, svgGroup, lineGlow, lineMain, dotOuter, dotInner }) => {
 const vis = windowPulse(t, def.tIn[0], def.tIn[1], def.tOut[0], def.tOut[1]);
 if (vis <= 0.01) {
@@ -1745,8 +1660,6 @@ const cardTop = clamp(rawTop, 300, HEIGHT - 220 - cardH);
 const slideY = (1 - vis) * 14;
 el.style.opacity = vis.toFixed(3);
 el.style.transform = translate3d(${cardLeft.toFixed(1)}px, ${(cardTop + slideY).toFixed(1)}px, 0);
-// Connect anchor dot to nearest vertical edge of callout card via sleek angled elbow
-const cardCenterX = cardLeft + cardW * 0.5;
 const attachY = pt.y < cardTop + cardH * 0.5 ? cardTop : cardTop + cardH;
 const attachX = clamp(pt.x, cardLeft + 36, cardLeft + cardW - 36);
 const midY = lerp(pt.y, attachY, 0.55);
@@ -1759,15 +1672,43 @@ dotInner.setAttribute('cx', pt.x.toFixed(1));
 dotInner.setAttribute('cy', pt.y.toFixed(1));
 svgGroup.style.opacity = vis.toFixed(3);
 });
-// --- Finale Milestone Card (16.8s - 20.0s) ---
+// Finale Milestone Card (16.8s - 20.0s)
 const finaleVis = smoothstep(16.8, 17.5, t);
 finaleCard.style.opacity = finaleVis.toFixed(3);
 finaleCard.style.transform = translate3d(0, ${((1 - finaleVis) * 18).toFixed(1)}px, 0);
 renderer.render(scene, camera);
+}
+// ---------------------------------------------------------
+// 11. Deterministic API + Auto-Start Preview (Zero requestAnimationFrame)
+// ---------------------------------------------------------
+let previewTimer = null;
+function stopPreview() {
+if (previewTimer !== null) {
+clearTimeout(previewTimer);
+previewTimer = null;
+}
+}
+window.renderAt = function renderAt(t) {
+window.__externalControlled = true;
+stopPreview();
+renderFrame(t);
 };
-// Paint frame 0 immediately on load
-window.renderAt(0);
+if (window.__externalControlled && window.__queuedT !== null) {
+renderFrame(window.__queuedT);
+} else {
+renderFrame(0);
+const startTime = performance.now();
+const tickPreview = () => {
+if (window.__externalControlled) {
+stopPreview();
+return;
+}
+const elapsed = ((performance.now() - startTime) / 1000) % window.DURATION;
+renderFrame(elapsed);
+previewTimer = setTimeout(tickPreview, 1000 / 30);
+};
+previewTimer = setTimeout(tickPreview, 1000 / 30);
+}
 </script>
 </body>
 </html>
-
