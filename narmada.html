@@ -1,1714 +1,2073 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=1080, height=1920, initial-scale=1.0" />
-<title>How Narmada Dam (Sardar Sarovar) Was Designed</title>
-<style>
-* {
-box-sizing: border-box;
-margin: 0;
-padding: 0;
-}
-html, body {
-width: 1080px;
-height: 1920px;
-overflow: hidden;
-background: #ebe4d8;
-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
--webkit-font-smoothing: antialiased;
-user-select: none;
-}
-#stage {
-position: relative;
-width: 1080px;
-height: 1920px;
-overflow: hidden;
-background: radial-gradient(circle at 50% 44%, #fcfaf6 0%, #f1ebe0 56%, #e1d7c6 100%);
-}
-#scene-canvas {
-position: absolute;
-inset: 0;
-width: 1080px;
-height: 1920px;
-display: block;
-}
-#leader-svg {
-position: absolute;
-inset: 0;
-width: 1080px;
-height: 1920px;
-pointer-events: none;
-z-index: 10;
-}
-#ui-layer {
-position: absolute;
-inset: 0;
-width: 1080px;
-height: 1920px;
-pointer-events: none;
-z-index: 20;
-}
-/* Header Block */
-.header-box {
-position: absolute;
-top: 64px;
-left: 56px;
-right: 56px;
-display: flex;
-flex-direction: column;
-gap: 12px;
-}
-.kicker-row {
-display: flex;
-align-items: center;
-gap: 14px;
-}
-.kicker-pill {
-display: inline-flex;
-align-items: center;
-gap: 9px;
-background: #0d7480;
-color: #ffffff;
-font-size: 20px;
-font-weight: 800;
-letter-spacing: 1.8px;
-text-transform: uppercase;
-padding: 9px 18px;
-border-radius: 999px;
-box-shadow: 0 6px 18px rgba(13, 116, 128, 0.24);
-}
-.kicker-dot {
-width: 9px;
-height: 9px;
-border-radius: 50%;
-background: #7ef0fa;
-}
-.location-pill {
-background: rgba(255, 255, 255, 0.88);
-color: #2c3e47;
-font-size: 20px;
-font-weight: 700;
-letter-spacing: 0.4px;
-padding: 9px 18px;
-border-radius: 999px;
-border: 1px solid rgba(20, 35, 42, 0.08);
-}
-.main-title {
-font-size: 56px;
-font-weight: 900;
-line-height: 1.08;
-letter-spacing: -1.1px;
-color: #132129;
-text-shadow: 0 2px 12px rgba(255, 255, 255, 0.7);
-}
-.sub-title {
-font-size: 27px;
-font-weight: 600;
-color: #465a64;
-letter-spacing: -0.2px;
-}
-/* Callout Labels */
-.callout {
-position: absolute;
-min-width: 270px;
-max-width: 390px;
-background: rgba(255, 255, 255, 0.96);
-border-radius: 16px;
-padding: 16px 22px 16px 20px;
-border-left: 6px solid #0d7480;
-box-shadow:
-0 14px 34px rgba(18, 30, 38, 0.16),
-0 2px 6px rgba(18, 30, 38, 0.08);
-transform-origin: center center;
-will-change: transform, opacity;
-}
-.callout.accent-gold {
-border-left-color: #d48324;
-}
-.callout.accent-blue {
-border-left-color: #1976a8;
-}
-.callout-tag {
-font-size: 16px;
-font-weight: 800;
-letter-spacing: 1.4px;
-text-transform: uppercase;
-color: #0d7480;
-margin-bottom: 4px;
-}
-.callout.accent-gold .callout-tag {
-color: #c27114;
-}
-.callout.accent-blue .callout-tag {
-color: #156691;
-}
-.callout-title {
-font-size: 30px;
-font-weight: 900;
-line-height: 1.14;
-color: #132129;
-letter-spacing: -0.4px;
-}
-.callout-desc {
-margin-top: 5px;
-font-size: 21px;
-font-weight: 500;
-line-height: 1.28;
-color: #4b5e68;
-}
-/* Finale Milestone Card */
-#finale-card {
-position: absolute;
-top: 298px;
-left: 56px;
-right: 56px;
-background: rgba(255, 255, 255, 0.96);
-border-radius: 22px;
-padding: 22px 28px;
-box-shadow:
-0 20px 48px rgba(15, 28, 36, 0.18),
-0 0 0 1px rgba(13, 116, 128, 0.16);
-opacity: 0;
-}
-.finale-top {
-display: flex;
-align-items: center;
-justify-content: space-between;
-margin-bottom: 16px;
-padding-bottom: 14px;
-border-bottom: 1.5px solid #e6ecee;
-}
-.finale-badge {
-background: #d48324;
-color: #ffffff;
-font-size: 20px;
-font-weight: 900;
-letter-spacing: 1.3px;
-text-transform: uppercase;
-padding: 7px 16px;
-border-radius: 10px;
-}
-.finale-note {
-font-size: 22px;
-font-weight: 700;
-color: #293b45;
-}
-.finale-grid {
-display: grid;
-grid-template-columns: repeat(4, 1fr);
-gap: 14px;
-}
-.stat-cell {
-background: #f4f8f9;
-border-radius: 14px;
-padding: 13px 12px;
-text-align: center;
-border: 1px solid #e1ecef;
-}
-.stat-val {
-font-size: 32px;
-font-weight: 900;
-color: #0b6873;
-letter-spacing: -0.6px;
-line-height: 1.1;
-}
-.stat-lbl {
-margin-top: 4px;
-font-size: 17px;
-font-weight: 700;
-color: #51646e;
-text-transform: uppercase;
-letter-spacing: 0.5px;
-}
-/* Bottom Engineering Timeline */
-.timeline-box {
-position: absolute;
-bottom: 54px;
-left: 56px;
-right: 56px;
-background: rgba(255, 255, 255, 0.92);
-border-radius: 20px;
-padding: 18px 24px 20px;
-box-shadow: 0 12px 32px rgba(18, 30, 38, 0.12);
-border: 1px solid rgba(255, 255, 255, 0.9);
-}
-.stage-labels {
-display: flex;
-justify-content: space-between;
-margin-bottom: 12px;
-font-size: 18px;
-font-weight: 800;
-color: #7d8e96;
-letter-spacing: 0.2px;
-}
-.stage-labels span.active {
-color: #0d7480;
-}
-.progress-track {
-width: 100%;
-height: 10px;
-background: #dfe7ea;
-border-radius: 999px;
-overflow: hidden;
-}
-.progress-fill {
-height: 100%;
-width: 0%;
-background: linear-gradient(90deg, #0d7480 0%, #1ba1b0 100%);
-border-radius: 999px;
-}
-</style>
-<script>
-window.DURATION = 20;
-window.__externalControlled = false;
-window.__queuedT = null;
-window.renderAt = function(t) {
-window.__externalControlled = true;
-window.__queuedT = t;
-};
-</script>
-<script type="importmap">
-{
-"imports": {
-"three": "https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.module.min.js"
-}
-}
-</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1080, height=1920, initial-scale=1.0" />
+  <title>How Narmada Dam (Sardar Sarovar) Was Designed</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      background: #ebe4d8;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      user-select: none;
+    }
+
+    #stage {
+      position: relative;
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 44%, #fcfaf6 0%, #f1ebe0 56%, #e1d7c6 100%);
+    }
+
+    #scene-canvas {
+      position: absolute;
+      inset: 0;
+      width: 1080px;
+      height: 1920px;
+      display: block;
+    }
+
+    #leader-svg {
+      position: absolute;
+      inset: 0;
+      width: 1080px;
+      height: 1920px;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    #ui-layer {
+      position: absolute;
+      inset: 0;
+      width: 1080px;
+      height: 1920px;
+      pointer-events: none;
+      z-index: 20;
+    }
+
+    /* Header Block */
+    .header-box {
+      position: absolute;
+      top: 64px;
+      left: 56px;
+      right: 56px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .kicker-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .kicker-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      background: #0d7480;
+      color: #ffffff;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      padding: 9px 18px;
+      border-radius: 999px;
+      box-shadow: 0 6px 18px rgba(13, 116, 128, 0.24);
+    }
+
+    .kicker-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #7ef0fa;
+    }
+
+    .location-pill {
+      background: rgba(255, 255, 255, 0.88);
+      color: #2c3e47;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      padding: 9px 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(20, 35, 42, 0.08);
+    }
+
+    .main-title {
+      font-size: 56px;
+      font-weight: 900;
+      line-height: 1.08;
+      letter-spacing: -1.1px;
+      color: #132129;
+      text-shadow: 0 2px 12px rgba(255, 255, 255, 0.7);
+    }
+
+    .sub-title {
+      font-size: 27px;
+      font-weight: 600;
+      color: #465a64;
+      letter-spacing: -0.2px;
+    }
+
+    /* Callout Labels */
+    .callout {
+      position: absolute;
+      min-width: 270px;
+      max-width: 390px;
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 16px;
+      padding: 16px 22px 16px 20px;
+      border-left: 6px solid #0d7480;
+      box-shadow:
+        0 14px 34px rgba(18, 30, 38, 0.16),
+        0 2px 6px rgba(18, 30, 38, 0.08);
+      transform-origin: center center;
+      will-change: transform, opacity;
+    }
+
+    .callout.accent-gold {
+      border-left-color: #d48324;
+    }
+
+    .callout.accent-blue {
+      border-left-color: #1976a8;
+    }
+
+    .callout-tag {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: #0d7480;
+      margin-bottom: 4px;
+    }
+
+    .callout.accent-gold .callout-tag {
+      color: #c27114;
+    }
+
+    .callout.accent-blue .callout-tag {
+      color: #156691;
+    }
+
+    .callout-title {
+      font-size: 30px;
+      font-weight: 900;
+      line-height: 1.14;
+      color: #132129;
+      letter-spacing: -0.4px;
+    }
+
+    .callout-desc {
+      margin-top: 5px;
+      font-size: 21px;
+      font-weight: 500;
+      line-height: 1.28;
+      color: #4b5e68;
+    }
+
+    /* Finale Milestone Card */
+    #finale-card {
+      position: absolute;
+      top: 298px;
+      left: 56px;
+      right: 56px;
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 22px;
+      padding: 22px 28px;
+      box-shadow:
+        0 20px 48px rgba(15, 28, 36, 0.18),
+        0 0 0 1px rgba(13, 116, 128, 0.16);
+      opacity: 0;
+    }
+
+    .finale-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1.5px solid #e6ecee;
+    }
+
+    .finale-badge {
+      background: #d48324;
+      color: #ffffff;
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: 1.3px;
+      text-transform: uppercase;
+      padding: 7px 16px;
+      border-radius: 10px;
+    }
+
+    .finale-note {
+      font-size: 22px;
+      font-weight: 700;
+      color: #293b45;
+    }
+
+    .finale-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .stat-cell {
+      background: #f4f8f9;
+      border-radius: 14px;
+      padding: 13px 12px;
+      text-align: center;
+      border: 1px solid #e1ecef;
+    }
+
+    .stat-val {
+      font-size: 32px;
+      font-weight: 900;
+      color: #0b6873;
+      letter-spacing: -0.6px;
+      line-height: 1.1;
+    }
+
+    .stat-lbl {
+      margin-top: 4px;
+      font-size: 17px;
+      font-weight: 700;
+      color: #51646e;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Bottom Engineering Timeline */
+    .timeline-box {
+      position: absolute;
+      bottom: 54px;
+      left: 56px;
+      right: 56px;
+      background: rgba(255, 255, 255, 0.94);
+      border-radius: 20px;
+      padding: 18px 24px 20px;
+      box-shadow: 0 12px 32px rgba(18, 30, 38, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      pointer-events: auto;
+    }
+
+    .timeline-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+
+    .stage-labels {
+      flex: 1;
+      display: flex;
+      justify-content: space-between;
+      font-size: 17px;
+      font-weight: 800;
+      color: #7d8e96;
+      letter-spacing: 0.2px;
+    }
+
+    .stage-labels span.active {
+      color: #0d7480;
+    }
+
+    #play-toggle {
+      background: #0d7480;
+      color: #ffffff;
+      border: none;
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      background: #dfe7ea;
+      border-radius: 999px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #0d7480 0%, #1ba1b0 100%);
+      border-radius: 999px;
+    }
+
+    #load-fallback {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 760px;
+      background: rgba(255, 255, 255, 0.97);
+      border-left: 8px solid #d48324;
+      border-radius: 20px;
+      padding: 28px 32px;
+      box-shadow: 0 24px 54px rgba(15, 28, 36, 0.22);
+      z-index: 40;
+      color: #132129;
+      font-size: 22px;
+      line-height: 1.45;
+    }
+
+    #load-fallback strong {
+      display: block;
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+  </style>
+  <script>
+    window.DURATION = 20;
+    window.__threeReady = false;
+    window.__externalCapture = false;
+    window.__renderCallCount = 0;
+    window.__queuedT = 0;
+
+    window.renderAt = function(t) {
+      var val = Number(t) || 0;
+      window.__queuedT = val;
+      window.__renderCallCount += 1;
+      // Only disable auto-playback if an external recorder steps through multiple frames or seeks t > 0
+      if (val > 0.001 || window.__renderCallCount > 1) {
+        window.__externalCapture = true;
+      }
+    };
+
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        if (!window.__threeReady) {
+          var box = document.getElementById('load-fallback');
+          if (box) box.style.display = 'block';
+        }
+      }, 3500);
+    });
+  </script>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.module.min.js"
+    }
+  }
+  </script>
 </head>
 <body>
-<div id="stage">
-<canvas id="scene-canvas" width="1080" height="1920"></canvas>
-<svg id="leader-svg" viewBox="0 0 1080 1920" xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)"></svg>
-<div id="ui-layer">
-<div class="header-box" id="header-box">
-<div class="kicker-row">
-<span class="kicker-pill"><span class="kicker-dot"></span>3D Engineering Breakdown</span>
-<span class="location-pill">Kevadia, Gujarat, India</span>
-</div>
-<h1 class="main-title">How Narmada Dam Was Designed</h1>
-<div class="sub-title">Sardar Sarovar Concrete Gravity Dam • Narmada River</div>
-</div>
-<div id="callouts-container"></div>
-<div id="finale-card">
-<div class="finale-top">
-<span class="finale-badge">Inaugurated 2017</span>
-<span class="finale-note">Sardar Sarovar Dam • Gujarat, India</span>
-</div>
-<div class="finale-grid">
-<div class="stat-cell">
-<div class="stat-val">163 m</div>
-<div class="stat-lbl">Height</div>
-</div>
-<div class="stat-cell">
-<div class="stat-val">1,210 m</div>
-<div class="stat-lbl">Length</div>
-</div>
-<div class="stat-cell">
-<div class="stat-val">30</div>
-<div class="stat-lbl">Radial Gates</div>
-</div>
-<div class="stat-cell">
-<div class="stat-val">1,450 MW</div>
-<div class="stat-lbl">Hydropower</div>
-</div>
-</div>
-</div>
-<div class="timeline-box">
-<div class="stage-labels" id="stage-labels">
-<span data-step="0">01 Gorge</span>
-<span data-step="1">02 Gravity Dam</span>
-<span data-step="2">03 30 Gates</span>
-<span data-step="3">04 1,450 MW</span>
-<span data-step="4">05 Reservoir & Canal</span>
-<span data-step="5">06 2017 Spillway</span>
-</div>
-<div class="progress-track">
-<div class="progress-fill" id="progress-fill"></div>
-</div>
-</div>
-</div>
-</div>
-<script type="module">
-import * as THREE from 'three';
-window.DURATION = 20;
-// ---------------------------------------------------------
-// Deterministic Math & Easing Utilities
-// ---------------------------------------------------------
-const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
-const lerp = (a, b, t) => a + (b - a) * t;
-const smoothstep = (e0, e1, x) => {
-const t = clamp((x - e0) / (e1 - e0), 0, 1);
-return t * t * (3 - 2 * t);
-};
-const easeOutCubic = (t) => 1 - Math.pow(1 - clamp(t, 0, 1), 3);
-const easeInOutCubic = (t) => {
-const x = clamp(t, 0, 1);
-return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
-};
-const windowPulse = (t, inStart, inEnd, outStart, outEnd) => {
-const a = smoothstep(inStart, inEnd, t);
-const b = 1 - smoothstep(outStart, outEnd, t);
-return a * b;
-};
-function hash2D(ix, iz) {
-const n = Math.sin(ix * 127.1 + iz * 311.7) * 43758.5453123;
-return n - Math.floor(n);
-}
-// ---------------------------------------------------------
-// Renderer, Scene & Camera (Exact 1080x1920 Portrait)
-// ---------------------------------------------------------
-const WIDTH = 1080;
-const HEIGHT = 1920;
-const canvas = document.getElementById('scene-canvas');
-const renderer = new THREE.WebGLRenderer({
-canvas,
-antialias: true,
-alpha: true,
-powerPreference: 'high-performance'
-});
-renderer.setPixelRatio(1);
-renderer.setSize(WIDTH, HEIGHT, false);
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.06;
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(45, WIDTH / HEIGHT, 1, 1400);
-camera.position.set(-140, 205, 270);
-// ---------------------------------------------------------
-// Architectural Studio Lighting
-// ---------------------------------------------------------
-const hemiLight = new THREE.HemisphereLight(0xe4f3ff, 0xc3a684, 1.15);
-hemiLight.position.set(0, 140, 0);
-scene.add(hemiLight);
-const sunLight = new THREE.DirectionalLight(0xfff4e0, 2.35);
-sunLight.position.set(-85, 135, 72);
-sunLight.castShadow = true;
-sunLight.shadow.mapSize.width = 2048;
-sunLight.shadow.mapSize.height = 2048;
-sunLight.shadow.camera.near = 20;
-sunLight.shadow.camera.far = 340;
-sunLight.shadow.camera.left = -105;
-sunLight.shadow.camera.right = 105;
-sunLight.shadow.camera.top = 105;
-sunLight.shadow.camera.bottom = -105;
-sunLight.shadow.bias = -0.0005;
-sunLight.shadow.normalBias = 0.03;
-scene.add(sunLight);
-const rimLight = new THREE.DirectionalLight(0xffe1b8, 0.65);
-rimLight.position.set(95, 70, -90);
-scene.add(rimLight);
-const cavernLight = new THREE.PointLight(0xffbe6b, 0, 38, 1.6);
-cavernLight.position.set(47, 1.5, 9);
-scene.add(cavernLight);
-// ---------------------------------------------------------
-// Procedural Canvas Textures (Self-Contained, Zero External URLs)
-// ---------------------------------------------------------
-function createConcreteTexture() {
-const c = document.createElement('canvas');
-c.width = 256;
-c.height = 256;
-const ctx = c.getContext('2d');
-ctx.fillStyle = '#e5e8eb';
-ctx.fillRect(0, 0, 256, 256);
-ctx.strokeStyle = 'rgba(130, 140, 150, 0.16)';
-ctx.lineWidth = 1;
-for (let y = 0; y < 256; y += 32) {
-ctx.beginPath();
-ctx.moveTo(0, y);
-ctx.lineTo(256, y);
-ctx.stroke();
-}
-for (let x = 0; x < 256; x += 64) {
-ctx.beginPath();
-ctx.moveTo(x, 0);
-ctx.lineTo(x, 256);
-ctx.stroke();
-}
-for (let i = 0; i < 1800; i++) {
-const px = Math.floor(hash2D(i, 1.3) * 256);
-const py = Math.floor(hash2D(i, 7.9) * 256);
-const shade = hash2D(i, 3.1) > 0.5 ? 'rgba(255,255,255,0.22)' : 'rgba(95,105,115,0.14)';
-ctx.fillStyle = shade;
-ctx.fillRect(px, py, 2, 2);
-}
-const tex = new THREE.CanvasTexture(c);
-tex.wrapS = THREE.RepeatWrapping;
-tex.wrapT = THREE.RepeatWrapping;
-tex.repeat.set(3, 3);
-return tex;
-}
-function createWaterNormalTexture() {
-const c = document.createElement('canvas');
-c.width = 256;
-c.height = 256;
-const ctx = c.getContext('2d');
-const img = ctx.createImageData(256, 256);
-for (let y = 0; y < 256; y++) {
-for (let x = 0; x < 256; x++) {
-const u = (x / 256) * Math.PI * 2;
-const v = (y / 256) * Math.PI * 2;
-const nx = Math.sin(u * 4 + Math.cos(v * 3)) * 0.35 + Math.cos(u * 8 - v * 6) * 0.15;
-const ny = Math.cos(v * 5 + Math.sin(u * 4)) * 0.35 + Math.sin(u * 6 + v * 9) * 0.15;
-const idx = (y * 256 + x) * 4;
-img.data[idx] = Math.floor((nx * 0.5 + 0.5) * 255);
-img.data[idx + 1] = Math.floor((ny * 0.5 + 0.5) * 255);
-img.data[idx + 2] = 240;
-img.data[idx + 3] = 255;
-}
-}
-ctx.putImageData(img, 0, 0);
-const tex = new THREE.CanvasTexture(c);
-tex.wrapS = THREE.RepeatWrapping;
-tex.wrapT = THREE.RepeatWrapping;
-tex.repeat.set(7, 7);
-return tex;
-}
-function createCascadeTexture() {
-const c = document.createElement('canvas');
-c.width = 256;
-c.height = 256;
-const ctx = c.getContext('2d');
-const grad = ctx.createLinearGradient(0, 0, 0, 256);
-grad.addColorStop(0, '#1fa5b3');
-grad.addColorStop(0.35, '#86e2ec');
-grad.addColorStop(0.75, '#e8fbff');
-grad.addColorStop(1, '#ffffff');
-ctx.fillStyle = grad;
-ctx.fillRect(0, 0, 256, 256);
-for (let i = 0; i < 420; i++) {
-const x = hash2D(i, 2.1) * 256;
-const y = hash2D(i, 5.4) * 256;
-const h = 18 + hash2D(i, 8.7) * 44;
-const w = 1.5 + hash2D(i, 4.2) * 3.0;
-ctx.fillStyle = hash2D(i, 9.5) > 0.35 ? 'rgba(255,255,255,0.52)' : 'rgba(20,148,163,0.34)';
-ctx.fillRect(x, y, w, h);
-}
-const tex = new THREE.CanvasTexture(c);
-tex.wrapS = THREE.RepeatWrapping;
-tex.wrapT = THREE.RepeatWrapping;
-tex.repeat.set(6, 2);
-return tex;
-}
-const concreteTex = createConcreteTexture();
-const waterNormalTex = createWaterNormalTexture();
-const cascadeTex = createCascadeTexture();
-// Shared Architectural Materials
-const concreteMat = new THREE.MeshStandardMaterial({
-color: 0xe7eaed,
-map: concreteTex,
-roughness: 0.72,
-metalness: 0.04
-});
-const concreteTrimMat = new THREE.MeshStandardMaterial({
-color: 0xcfd5db,
-map: concreteTex,
-roughness: 0.68,
-metalness: 0.06
-});
-const foundationMat = new THREE.MeshStandardMaterial({
-color: 0x9aa2aa,
-roughness: 0.85,
-metalness: 0.05
-});
-const steelGateMat = new THREE.MeshStandardMaterial({
-color: 0x2b3945,
-roughness: 0.38,
-metalness: 0.65,
-side: THREE.DoubleSide
-});
-const steelRibMat = new THREE.MeshStandardMaterial({
-color: 0x4b5f70,
-roughness: 0.42,
-metalness: 0.55
-});
-const turbineBlueMat = new THREE.MeshStandardMaterial({
-color: 0x166896,
-roughness: 0.35,
-metalness: 0.45
-});
-const turbineGoldMat = new THREE.MeshStandardMaterial({
-color: 0xe39b32,
-emissive: 0x5c3405,
-emissiveIntensity: 0.45,
-roughness: 0.3,
-metalness: 0.7
-});
-// ---------------------------------------------------------
-// Root Diorama Container
-// ---------------------------------------------------------
-const diorama = new THREE.Group();
-scene.add(diorama);
-// Soft studio contact shadow underneath diorama plinth
-const shadowPlane = new THREE.Mesh(
-new THREE.PlaneGeometry(186, 210),
-new THREE.MeshBasicMaterial({
-color: 0x5d5142,
-transparent: true,
-opacity: 0.14
-})
-);
-shadowPlane.rotation.x = -Math.PI / 2;
-shadowPlane.position.set(2, -13.1, 2);
-scene.add(shadowPlane);
-// ---------------------------------------------------------
-// 1. Low-Poly Satpura & Vindhya Gorge Terrain + Cutaway Plinth
-// ---------------------------------------------------------
-function getRiverCenterX(z) {
-if (z <= 0) {
-return Math.sin(z * 0.032) * 6.5;
-}
-return Math.sin(z * 0.042) * 8.5 - z * 0.07;
-}
-function getCanalCenterX(z) {
-const t = clamp((z + 14) / 102, 0, 1);
-return 45.5 + Math.sin(t * Math.PI * 0.85) * 6.5 + t * 5.0;
-}
-function getTerrainHeight(x, z) {
-const rcx = getRiverCenterX(z);
-const distRiver = Math.abs(x - rcx);
-const canyonT = smoothstep(8.5, 34.0, distRiver);
-let h = lerp(-3.8, 13.8, canyonT);
-const hillMask = smoothstep(23.0, 46.0, distRiver);
-const ridge1 = Math.sin(x * 0.055 + 0.6) * Math.cos(z * 0.048 - 0.3) * 9.5;
-const ridge2 = Math.sin(x * 0.11 - z * 0.085) * 4.2;
-const ridge3 = Math.cos(x * 0.18 + z * 0.16) * 1.8;
-const peakBoost = smoothstep(32.0, 74.0, Math.abs(x)) * 8.5;
-const upstreamBasin = z < -4 ? smoothstep(-4, -55, z) * (1 - smoothstep(16, 48, distRiver)) * 4.5 : 0;
-h += hillMask * (ridge1 + ridge2 + ridge3 + peakBoost) - upstreamBasin;
-if (z >= -18) {
-const ccx = getCanalCenterX(z);
-const distCanal = Math.abs(x - ccx);
-const canalBench = 1 - smoothstep(3.2, 8.5, distCanal);
-const canalTrench = 1 - smoothstep(1.6, 3.3, distCanal);
-h = lerp(h, 10.6, canalBench * 0.92);
-h = lerp(h, 8.4, canalTrench);
-}
-if (x >= 35.0 && x <= 62.0 && z >= -3.0 && z <= 22.0) {
-const edgeX = Math.min(smoothstep(35.0, 36.5, x), 1 - smoothstep(60.5, 62.0, x));
-const edgeZ = Math.min(smoothstep(-3.0, -1.5, z), 1 - smoothstep(20.5, 22.0, z));
-h = lerp(h, -4.8, edgeX * edgeZ);
-}
-return h;
-}
-function buildTerrain() {
-const group = new THREE.Group();
-const segX = 152;
-const segZ = 176;
-const minX = -76, maxX = 76;
-const minZ = -88, maxZ = 88;
-const planeGeom = new THREE.PlaneGeometry(maxX - minX, maxZ - minZ, segX, segZ);
-planeGeom.rotateX(-Math.PI / 2);
-const pos = planeGeom.attributes.position;
-for (let i = 0; i < pos.count; i++) {
-let vx = pos.getX(i);
-let vz = pos.getZ(i);
-const isBorder = Math.abs(vx) > 74.8 || Math.abs(vz) > 86.8;
-const nearDam = Math.abs(vz - 4) < 16;
-const nearCanal = vz > -20 && Math.abs(vx - getCanalCenterX(vz)) < 9.5;
-const nearCutaway = vx > 33 && vx < 64 && vz > -5 && vz < 24;
-if (!isBorder && !nearDam && !nearCanal && !nearCutaway) {
-vx += (hash2D(vx, vz) - 0.5) * 0.34;
-vz += (hash2D(vz, vx) - 0.5) * 0.34;
-}
-const vy = getTerrainHeight(vx, vz);
-pos.setXYZ(i, vx, vy, vz);
-}
-const nonIndexed = planeGeom.toNonIndexed();
-nonIndexed.computeVertexNormals();
-const nPos = nonIndexed.attributes.position;
-const nNorm = nonIndexed.attributes.normal;
-const colors = new Float32Array(nPos.count * 3);
-const colRiverRock = new THREE.Color(0x697078);
-const colSandstoneWarm = new THREE.Color(0xdcb88d);
-const colSandstoneDeep = new THREE.Color(0xc59867);
-const colSageLight = new THREE.Color(0x9bb386);
-const colSageRich = new THREE.Color(0x7c9769);
-const colCutawayFloor = new THREE.Color(0x525860);
-const tmpColor = new THREE.Color();
-for (let i = 0; i < nPos.count; i += 3) {
-const cx = (nPos.getX(i) + nPos.getX(i + 1) + nPos.getX(i + 2)) / 3;
-const cy = (nPos.getY(i) + nPos.getY(i + 1) + nPos.getY(i + 2)) / 3;
-const cz = (nPos.getZ(i) + nPos.getZ(i + 1) + nPos.getZ(i + 2)) / 3;
-const ny = nNorm.getY(i);
-const inCutaway = cx >= 35.2 && cx <= 61.8 && cz >= -2.8 && cz <= 21.8 && cy < -3.0;
-const facetVar = (hash2D(cx * 1.7, cz * 1.7) - 0.5) * 0.06;
-if (inCutaway) {
-tmpColor.copy(colCutawayFloor);
-} else if (cy < 2.2) {
-const t = smoothstep(-3.8, 2.2, cy);
-tmpColor.copy(colRiverRock).lerp(colSandstoneDeep, t);
-} else if (cy < 11.5) {
-const t = smoothstep(2.2, 11.5, cy);
-tmpColor.copy(colSandstoneDeep).lerp(colSandstoneWarm, t);
-if (ny > 0.86 && cy > 8.5) {
-tmpColor.lerp(colSageLight, 0.45);
-}
-} else {
-const slopeGreen = smoothstep(0.72, 0.95, ny);
-const elevGreen = smoothstep(11.5, 22.0, cy);
-const gMix = clamp(slopeGreen * 0.78 + elevGreen * 0.35, 0, 1);
-tmpColor.copy(colSandstoneWarm).lerp(colSageLight, gMix);
-tmpColor.lerp(colSageRich, smoothstep(18.0, 29.0, cy) * 0.55);
-}
-tmpColor.offsetHSL(0, 0, facetVar);
-for (let k = 0; k < 3; k++) {
-colors[(i + k) * 3] = tmpColor.r;
-colors[(i + k) * 3 + 1] = tmpColor.g;
-colors[(i + k) * 3 + 2] = tmpColor.b;
-}
-}
-nonIndexed.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-const terrainMat = new THREE.MeshStandardMaterial({
-vertexColors: true,
-roughness: 0.86,
-metalness: 0.02,
-flatShading: true
-});
-const terrainMesh = new THREE.Mesh(nonIndexed, terrainMat);
-terrainMesh.receiveShadow = true;
-terrainMesh.castShadow = true;
-group.add(terrainMesh);
-const baseBottomY = -10.8;
-const skirtGeo = new THREE.BufferGeometry();
-const skirtVerts = [];
-const skirtCols = [];
-const strataTop = new THREE.Color(0xd2ad82);
-const strataMid = new THREE.Color(0xb8895a);
-const strataDeep = new THREE.Color(0x6d6764);
-function addSkirtQuad(x0, z0, x1, z1) {
-const y0 = getTerrainHeight(x0, z0);
-const y1 = getTerrainHeight(x1, z1);
-const midY = (y0 + y1) * 0.5;
-const topCol = midY > 11 ? strataTop : strataMid;
-skirtVerts.push(x0, y0, z0, x0, baseBottomY, z0, x1, y1, z1);
-skirtCols.push(
-topCol.r, topCol.g, topCol.b,
-strataDeep.r, strataDeep.g, strataDeep.b,
-topCol.r, topCol.g, topCol.b
-);
-skirtVerts.push(x1, y1, z1, x0, baseBottomY, z0, x1, baseBottomY, z1);
-skirtCols.push(
-topCol.r, topCol.g, topCol.b,
-strataDeep.r, strataDeep.g, strataDeep.b,
-strataDeep.r, strataDeep.g, strataDeep.b
-);
-}
-const stepX = (maxX - minX) / segX;
-const stepZ = (maxZ - minZ) / segZ;
-for (let i = 0; i < segX; i++) {
-addSkirtQuad(minX + i * stepX, maxZ, minX + (i + 1) * stepX, maxZ);
-}
-for (let i = 0; i < segX; i++) {
-addSkirtQuad(minX + (i + 1) * stepX, minZ, minX + i * stepX, minZ);
-}
-for (let j = 0; j < segZ; j++) {
-addSkirtQuad(minX, minZ + j * stepZ, minX, minZ + (j + 1) * stepZ);
-}
-for (let j = 0; j < segZ; j++) {
-addSkirtQuad(maxX, minZ + (j + 1) * stepZ, maxX, minZ + j * stepZ);
-}
-skirtGeo.setAttribute('position', new THREE.Float32BufferAttribute(skirtVerts, 3));
-skirtGeo.setAttribute('color', new THREE.Float32BufferAttribute(skirtCols, 3));
-skirtGeo.computeVertexNormals();
-const skirtMat = new THREE.MeshStandardMaterial({
-vertexColors: true,
-roughness: 0.88,
-metalness: 0.02,
-flatShading: true
-});
-const skirtMesh = new THREE.Mesh(skirtGeo, skirtMat);
-skirtMesh.receiveShadow = true;
-group.add(skirtMesh);
-const plinth = new THREE.Mesh(
-new THREE.BoxGeometry(154.4, 2.0, 178.4),
-new THREE.MeshStandardMaterial({
-color: 0x263138,
-roughness: 0.65,
-metalness: 0.15
-})
-);
-plinth.position.set(0, -11.8, 0);
-plinth.receiveShadow = true;
-group.add(plinth);
-const plinthTrim = new THREE.Mesh(
-new THREE.BoxGeometry(155.0, 0.35, 179.0),
-new THREE.MeshStandardMaterial({
-color: 0xc59b63,
-roughness: 0.45,
-metalness: 0.35
-})
-);
-plinthTrim.position.set(0, -10.75, 0);
-group.add(plinthTrim);
-return group;
-}
-const terrainGroup = buildTerrain();
-diorama.add(terrainGroup);
-// ---------------------------------------------------------
-// 2. Foundation Trench & Stilling Basin Apron
-// ---------------------------------------------------------
-const foundationGroup = new THREE.Group();
-diorama.add(foundationGroup);
-const foundationBlocks = [];
-const numFndBlocks = 20;
-for (let i = 0; i < numFndBlocks; i++) {
-const bx = lerp(-56, 56, i / (numFndBlocks - 1));
-const block = new THREE.Mesh(
-new THREE.BoxGeometry(5.8, 2.2, 16.2),
-foundationMat
-);
-block.position.set(bx, -3.5, 7.6);
-block.castShadow = true;
-block.receiveShadow = true;
-foundationGroup.add(block);
-foundationBlocks.push({
-mesh: block,
-targetY: -3.5,
-delay: Math.abs(bx) / 60 * 0.55
-});
-}
-const stillingBasin = new THREE.Group();
-const basinFloor = new THREE.Mesh(
-new THREE.BoxGeometry(68, 1.4, 13.5),
-concreteTrimMat
-);
-basinFloor.position.set(0, -3.1, 21.5);
-basinFloor.receiveShadow = true;
-stillingBasin.add(basinFloor);
-[-33.6, 33.6].forEach((wx) => {
-const wall = new THREE.Mesh(
-new THREE.BoxGeometry(1.1, 5.2, 14.5),
-concreteMat
-);
-wall.position.set(wx, -0.6, 21.5);
-wall.castShadow = true;
-wall.receiveShadow = true;
-stillingBasin.add(wall);
-});
-for (let i = 0; i < 15; i++) {
-const bx = -28 + i * 4.0;
-const baffle = new THREE.Mesh(
-new THREE.BoxGeometry(1.6, 1.3, 1.6),
-concreteMat
-);
-baffle.position.set(bx, -2.0, 21.0);
-baffle.castShadow = true;
-stillingBasin.add(baffle);
-}
-foundationGroup.add(stillingBasin);
-// ---------------------------------------------------------
-// 3. Stepped Concrete Gravity Dam Monoliths (1,210 m long, 163 m tall)
-// ---------------------------------------------------------
-const monolithsGroup = new THREE.Group();
-diorama.add(monolithsGroup);
-function createSpillwaySectionGeometry(width) {
-const s = new THREE.Shape();
-s.moveTo(0.0, -3.2);
-s.lineTo(0.0, 10.25);
-s.quadraticCurveTo(-0.55, 10.58, -1.45, 9.75);
-s.lineTo(-13.2, -1.6);
-s.quadraticCurveTo(-14.6, -2.35, -15.8, -1.45);
-s.lineTo(-15.8, -3.2);
-s.closePath();
-const geom = new THREE.ExtrudeGeometry(s, {
-depth: width,
-bevelEnabled: false,
-curveSegments: 12
-});
-geom.rotateY(Math.PI / 2);
-geom.translate(-width * 0.5, 0, 0);
-geom.computeVertexNormals();
-return geom;
-}
-function createNonOverflowSectionGeometry(width) {
-const s = new THREE.Shape();
-s.moveTo(0.4, -3.2);
-s.lineTo(0.0, 13.1);
-s.lineTo(-2.1, 13.1);
-s.lineTo(-15.2, -3.2);
-s.closePath();
-const geom = new THREE.ExtrudeGeometry(s, {
-depth: width,
-bevelEnabled: false
-});
-geom.rotateY(Math.PI / 2);
-geom.translate(-width * 0.5, 0, 0);
-geom.computeVertexNormals();
-return geom;
-}
-const monolithItems = [];
-const leftCount = 6;
-const leftStart = -60.5;
-const leftEnd = -33.2;
-const leftW = (leftEnd - leftStart) / leftCount;
-const leftGeom = createNonOverflowSectionGeometry(leftW - 0.14);
-for (let i = 0; i < leftCount; i++) {
-const cx = leftStart + (i + 0.5) * leftW;
-const m = new THREE.Mesh(leftGeom, i % 2 === 0 ? concreteMat : concreteTrimMat);
-m.position.set(cx, 0, 0);
-m.castShadow = true;
-m.receiveShadow = true;
-monolithsGroup.add(m);
-monolithItems.push({
-mesh: m,
-targetY: 0,
-order: i * 0.045
-});
-}
-const centerCount = 15;
-const centerSpan = 66.4;
-const centerW = centerSpan / centerCount;
-const centerGeom = createSpillwaySectionGeometry(centerW - 0.12);
-for (let i = 0; i < centerCount; i++) {
-const cx = -33.2 + (i + 0.5) * centerW;
-const m = new THREE.Mesh(centerGeom, i % 2 === 0 ? concreteMat : concreteTrimMat);
-m.position.set(cx, 0, 0);
-m.castShadow = true;
-m.receiveShadow = true;
-monolithsGroup.add(m);
-monolithItems.push({
-mesh: m,
-targetY: 0,
-order: 0.25 + (1 - Math.abs(cx) / 34) * 0.35
-});
-}
-const rightCount = 6;
-const rightStart = 33.2;
-const rightEnd = 60.5;
-const rightW = (rightEnd - rightStart) / rightCount;
-const rightGeom = createNonOverflowSectionGeometry(rightW - 0.14);
-for (let i = 0; i < rightCount; i++) {
-const cx = rightStart + (i + 0.5) * rightW;
-const m = new THREE.Mesh(rightGeom, i % 2 === 0 ? concreteMat : concreteTrimMat);
-m.position.set(cx, 0, 0);
-m.castShadow = true;
-m.receiveShadow = true;
-monolithsGroup.add(m);
-monolithItems.push({
-mesh: m,
-targetY: 0,
-order: (rightCount - 1 - i) * 0.045
-});
-}
-// ---------------------------------------------------------
-// 4. 31 Spillway Piers, Crest Roadway Bridge & 30 Radial Gates
-// ---------------------------------------------------------
-const piersAndDeckGroup = new THREE.Group();
-diorama.add(piersAndDeckGroup);
-const NUM_GATES = 30;
-const spillwayLeft = -33.0;
-const spillwayRight = 33.0;
-const bayPitch = (spillwayRight - spillwayLeft) / NUM_GATES;
-const pierGeom = new THREE.BoxGeometry(0.42, 4.4, 6.2);
-for (let p = 0; p <= NUM_GATES; p++) {
-const px = spillwayLeft + p * bayPitch;
-const pier = new THREE.Mesh(pierGeom, concreteMat);
-pier.position.set(px, 11.7, 2.5);
-pier.castShadow = true;
-pier.receiveShadow = true;
-piersAndDeckGroup.add(pier);
-}
-const crestDeck = new THREE.Mesh(
-new THREE.BoxGeometry(121.0, 0.55, 2.6),
-concreteMat
-);
-crestDeck.position.set(0, 13.7, 1.3);
-crestDeck.castShadow = true;
-crestDeck.receiveShadow = true;
-piersAndDeckGroup.add(crestDeck);
-[-0.1, 2.5].forEach((pz) => {
-const parapet = new THREE.Mesh(
-new THREE.BoxGeometry(121.0, 0.42, 0.18),
-concreteTrimMat
-);
-parapet.position.set(0, 14.15, pz);
-piersAndDeckGroup.add(parapet);
-});
-const lampMat = new THREE.MeshStandardMaterial({
-color: 0xfff3d1,
-emissive: 0xffd175,
-emissiveIntensity: 0.7
-});
-for (let lx = -56; lx <= 56; lx += 8) {
-const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.08, 1.35, 6), steelRibMat);
-pole.position.set(lx, 14.8, 0.1);
-piersAndDeckGroup.add(pole);
-const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.14, 6, 6), lampMat);
-bulb.position.set(lx, 15.5, 0.1);
-piersAndDeckGroup.add(bulb);
-}
-// 30 Radial Spillway (Tainter) Gates
-const gatesGroup = new THREE.Group();
-diorama.add(gatesGroup);
-const radialGates = [];
-const gateWidth = bayPitch - 0.46;
-const gateRadius = 2.75;
-const gateArc = 0.78;
-const skinGeom = new THREE.CylinderGeometry(
-gateRadius,
-gateRadius,
-gateWidth,
-10,
-1,
-true,
--Math.PI * 0.5 - gateArc * 0.48,
-gateArc
-);
-skinGeom.rotateZ(Math.PI / 2);
-const armGeom = new THREE.BoxGeometry(0.1, 0.18, gateRadius - 0.1);
-for (let g = 0; g < NUM_GATES; g++) {
-const gx = spillwayLeft + (g + 0.5) * bayPitch;
-const gatePivot = new THREE.Group();
-gatePivot.position.set(gx, 11.65, 3.1);
-const skin = new THREE.Mesh(skinGeom, steelGateMat);
-skin.castShadow = true;
-skin.receiveShadow = true;
-gatePivot.add(skin);
-[-0.55, 0.0, 0.55].forEach((ry) => {
-const rib = new THREE.Mesh(
-new THREE.BoxGeometry(gateWidth, 0.14, 0.22),
-steelRibMat
-);
-rib.position.set(0, ry - 0.35, -gateRadius + 0.08);
-gatePivot.add(rib);
-});
-[-gateWidth * 0.44, gateWidth * 0.44].forEach((ax) => {
-const upperArm = new THREE.Mesh(armGeom, steelRibMat);
-upperArm.position.set(ax, 0.15, -gateRadius * 0.5);
-upperArm.rotation.x = 0.18;
-gatePivot.add(upperArm);
-const lowerArm = new THREE.Mesh(armGeom, steelRibMat);
-lowerArm.position.set(ax, -0.65, -gateRadius * 0.5);
-lowerArm.rotation.x = -0.25;
-gatePivot.add(lowerArm);
-});
-gatesGroup.add(gatePivot);
-radialGates.push({
-pivot: gatePivot,
-baseX: gx,
-baseY: 11.65,
-baseZ: 3.1,
-index: g
-});
-}
-// ---------------------------------------------------------
-// 5. Underground Hydroelectric Powerhouse Cutaway & Canal Head Powerhouse (1,450 MW)
-// ---------------------------------------------------------
-const powerhouseGroup = new THREE.Group();
-diorama.add(powerhouseGroup);
-const cavernFrameMat = new THREE.MeshStandardMaterial({
-color: 0xd9dfe4,
-roughness: 0.65
-});
-const cavernBackWall = new THREE.Mesh(new THREE.BoxGeometry(24.5, 11.5, 1.2), cavernFrameMat);
-cavernBackWall.position.set(48.0, 0.6, 2.2);
-cavernBackWall.receiveShadow = true;
-powerhouseGroup.add(cavernBackWall);
-const cavernSideWall = new THREE.Mesh(new THREE.BoxGeometry(1.2, 11.5, 19.5), cavernFrameMat);
-cavernSideWall.position.set(36.0, 0.6, 11.4);
-cavernSideWall.receiveShadow = true;
-powerhouseGroup.add(cavernSideWall);
-const vaultRoof = new THREE.Mesh(
-new THREE.CylinderGeometry(6.2, 6.2, 23.8, 16, 1, true, 0, Math.PI),
-new THREE.MeshStandardMaterial({
-color: 0xe6ebef,
-roughness: 0.6,
-side: THREE.DoubleSide
-})
-);
-vaultRoof.rotation.z = Math.PI / 2;
-vaultRoof.position.set(48.0, 4.4, 8.2);
-powerhouseGroup.add(vaultRoof);
-const ceilingStrip = new THREE.Mesh(
-new THREE.BoxGeometry(22.0, 0.25, 0.8),
-new THREE.MeshStandardMaterial({
-color: 0xfff2cc,
-emissive: 0xffb84d,
-emissiveIntensity: 1.5
-})
-);
-ceilingStrip.position.set(48.0, 9.8, 8.2);
-powerhouseGroup.add(ceilingStrip);
-const machineFloor = new THREE.Mesh(
-new THREE.BoxGeometry(24.2, 1.2, 17.5),
-concreteTrimMat
-);
-machineFloor.position.set(48.0, -3.6, 10.6);
-machineFloor.receiveShadow = true;
-powerhouseGroup.add(machineFloor);
-const penstockMat = new THREE.MeshStandardMaterial({
-color: 0x3b4956,
-roughness: 0.4,
-metalness: 0.65
-});
-const turbineUnits = [];
-for (let u = 0; u < 6; u++) {
-const ux = 38.6 + u * 3.75;
-const penstock = new THREE.Mesh(
-new THREE.CylinderGeometry(0.68, 0.68, 13.5, 12),
-penstockMat
-);
-penstock.position.set(ux, 3.2, 1.4);
-penstock.rotation.x = 0.68;
-penstock.castShadow = true;
-powerhouseGroup.add(penstock);
-const unitGroup = new THREE.Group();
-unitGroup.position.set(ux, -1.6, 8.2);
-const spiral = new THREE.Mesh(
-new THREE.TorusGeometry(1.05, 0.45, 8, 16),
-penstockMat
-);
-spiral.rotation.x = Math.PI / 2;
-spiral.position.y = -0.6;
-unitGroup.add(spiral);
-const stator = new THREE.Mesh(
-new THREE.CylinderGeometry(1.22, 1.28, 2.1, 16),
-turbineBlueMat
-);
-stator.position.y = 0.85;
-stator.castShadow = true;
-unitGroup.add(stator);
-const rotor = new THREE.Mesh(
-new THREE.CylinderGeometry(0.75, 0.85, 0.65, 8),
-turbineGoldMat
-);
-rotor.position.y = 2.15;
-unitGroup.add(rotor);
-const tailrace = new THREE.Mesh(
-new THREE.CylinderGeometry(0.55, 0.62, 9.5, 10),
-penstockMat
-);
-tailrace.rotation.x = Math.PI / 2;
-tailrace.position.set(0, -1.0, 5.2);
-unitGroup.add(tailrace);
-powerhouseGroup.add(unitGroup);
-turbineUnits.push({
-group: unitGroup,
-rotor,
-penstock,
-targetY: -1.6,
-index: u
-});
-}
-// Canal Head Powerhouse (250 MW)
-const chphGroup = new THREE.Group();
-const chphHall = new THREE.Mesh(
-new THREE.BoxGeometry(9.6, 4.6, 6.2),
-concreteMat
-);
-chphHall.position.set(45.5, 11.8, -12.5);
-chphHall.castShadow = true;
-chphHall.receiveShadow = true;
-chphGroup.add(chphHall);
-const chphRoof = new THREE.Mesh(
-new THREE.BoxGeometry(10.2, 0.5, 6.8),
-turbineBlueMat
-);
-chphRoof.position.set(45.5, 14.3, -12.5);
-chphGroup.add(chphRoof);
-powerhouseGroup.add(chphGroup);
-// ---------------------------------------------------------
-// 6. Narmada Main Canal Concrete Lining
-// ---------------------------------------------------------
-function buildCanalLining() {
-const segs = 64;
-const zStart = -15.0;
-const zEnd = 87.8;
-const verts = [];
-const indices = [];
-const prof = [
-[-3.6, 10.65],
-[-1.8, 8.45],
-[1.8, 8.45],
-[3.6, 10.65]
-];
-for (let i = 0; i <= segs; i++) {
-const z = lerp(zStart, zEnd, i / segs);
-const cx = getCanalCenterX(z);
-for (let p = 0; p < prof.length; p++) {
-verts.push(cx + prof[p][0], prof[p][1], z);
-}
-}
-for (let i = 0; i < segs; i++) {
-const rowA = i * 4;
-const rowB = (i + 1) * 4;
-for (let p = 0; p < 3; p++) {
-const a = rowA + p;
-const b = rowA + p + 1;
-const c = rowB + p;
-const d = rowB + p + 1;
-indices.push(a, c, b, b, c, d);
-}
-}
-const geom = new THREE.BufferGeometry();
-geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
-geom.setIndex(indices);
-geom.computeVertexNormals();
-const mat = new THREE.MeshStandardMaterial({
-color: 0xdce2e6,
-roughness: 0.72,
-side: THREE.DoubleSide
-});
-const mesh = new THREE.Mesh(geom, mat);
-mesh.receiveShadow = true;
-return mesh;
-}
-const canalLiningMesh = buildCanalLining();
-diorama.add(canalLiningMesh);
-// ---------------------------------------------------------
-// 7. Water System: Upstream Reservoir, Canal Flow, Spillway Cascades & Downstream River
-// ---------------------------------------------------------
-const waterGroup = new THREE.Group();
-diorama.add(waterGroup);
-const reservoirMat = new THREE.MeshStandardMaterial({
-color: 0x0d727e,
-emissive: 0x05333a,
-emissiveIntensity: 0.35,
-normalMap: waterNormalTex,
-normalScale: new THREE.Vector2(0.45, 0.45),
-roughness: 0.16,
-metalness: 0.12,
-transparent: true,
-opacity: 0.93
-});
-const reservoirBox = new THREE.Mesh(
-new THREE.BoxGeometry(151.6, 15.5, 87.75),
-reservoirMat
-);
-reservoirBox.position.set(0, -10.0, -43.92);
-reservoirBox.receiveShadow = true;
-waterGroup.add(reservoirBox);
-function buildCanalWaterMesh() {
-const segs = 64;
-const zStart = -14.5;
-const zEnd = 87.8;
-const verts = [];
-const uvs = [];
-const indices = [];
-for (let i = 0; i <= segs; i++) {
-const t = i / segs;
-const z = lerp(zStart, zEnd, t);
-const cx = getCanalCenterX(z);
-verts.push(cx - 2.95, 9.95, z);
-verts.push(cx + 2.95, 9.95, z);
-uvs.push(0, t * 14);
-uvs.push(1, t * 14);
-}
-for (let i = 0; i < segs; i++) {
-const a = i * 2;
-const b = a + 1;
-const c = a + 2;
-const d = a + 3;
-indices.push(a, c, b, b, c, d);
-}
-const geom = new THREE.BufferGeometry();
-geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
-geom.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
-geom.setIndex(indices);
-geom.computeVertexNormals();
-const mat = new THREE.MeshStandardMaterial({
-color: 0x1596a4,
-emissive: 0x07434b,
-emissiveIntensity: 0.35,
-normalMap: waterNormalTex,
-normalScale: new THREE.Vector2(0.5, 0.5),
-roughness: 0.18,
-transparent: true,
-opacity: 0.94
-});
-return new THREE.Mesh(geom, mat);
-}
-const canalWaterMesh = buildCanalWaterMesh();
-waterGroup.add(canalWaterMesh);
-function buildDownstreamRiverMesh() {
-const segs = 56;
-const zStart = 15.5;
-const zEnd = 87.8;
-const verts = [];
-const uvs = [];
-const indices = [];
-for (let i = 0; i <= segs; i++) {
-const t = i / segs;
-const z = lerp(zStart, zEnd, t);
-const rcx = getRiverCenterX(z);
-const halfW = z < 28 ? lerp(32.5, 14.5, smoothstep(15.5, 28.0, z)) : 14.5 + Math.sin(z * 0.08) * 1.5;
-verts.push(rcx - halfW, -1.9, z);
-verts.push(rcx + halfW, -1.9, z);
-uvs.push(0, t * 10);
-uvs.push(1, t * 10);
-}
-for (let i = 0; i < segs; i++) {
-const a = i * 2;
-const b = a + 1;
-const c = a + 2;
-const d = a + 3;
-indices.push(a, c, b, b, c, d);
-}
-const geom = new THREE.BufferGeometry();
-geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
-geom.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
-geom.setIndex(indices);
-geom.computeVertexNormals();
-const mat = new THREE.MeshStandardMaterial({
-color: 0x117f8d,
-emissive: 0x05353c,
-emissiveIntensity: 0.32,
-normalMap: waterNormalTex,
-normalScale: new THREE.Vector2(0.55, 0.55),
-roughness: 0.2,
-transparent: true,
-opacity: 0.92
-});
-return new THREE.Mesh(geom, mat);
-}
-const downstreamRiverMesh = buildDownstreamRiverMesh();
-waterGroup.add(downstreamRiverMesh);
-function createCascadeSheetGeometry(width) {
-const pts = [
-[0.45, 10.65],
-[1.45, 9.95],
-[4.5, 6.95],
-[8.5, 3.05],
-[12.8, -1.15],
-[14.8, -1.95],
-[16.2, -1.25]
-];
-const verts = [];
-const uvs = [];
-const indices = [];
-for (let i = 0; i < pts.length; i++) {
-const v = i / (pts.length - 1);
-const [pz, py] = pts[i];
-verts.push(-width * 0.5, py, pz);
-verts.push(width * 0.5, py, pz);
-uvs.push(0, v);
-uvs.push(1, v);
-}
-for (let i = 0; i < pts.length - 1; i++) {
-const a = i * 2;
-const b = a + 1;
-const c = a + 2;
-const d = a + 3;
-indices.push(a, c, b, b, c, d);
-}
-const geom = new THREE.BufferGeometry();
-geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
-geom.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
-geom.setIndex(indices);
-geom.computeVertexNormals();
-return geom;
-}
-const cascadeMat = new THREE.MeshStandardMaterial({
-color: 0xdff9fc,
-map: cascadeTex,
-emissive: 0x36b5c4,
-emissiveIntensity: 0.35,
-roughness: 0.25,
-transparent: true,
-opacity: 0.92,
-side: THREE.DoubleSide
-});
-const cascadeSheetGeom = createCascadeSheetGeometry(gateWidth - 0.04);
-const cascadeSheets = [];
-for (let g = 0; g < NUM_GATES; g++) {
-const gx = spillwayLeft + (g + 0.5) * bayPitch;
-const sheet = new THREE.Mesh(cascadeSheetGeom, cascadeMat);
-sheet.position.set(gx, 0, 0);
-sheet.visible = false;
-waterGroup.add(sheet);
-cascadeSheets.push(sheet);
-}
-const foamPlumes = [];
-const foamMat = new THREE.MeshStandardMaterial({
-color: 0xffffff,
-emissive: 0x9ceaf2,
-emissiveIntensity: 0.35,
-roughness: 0.55,
-transparent: true,
-opacity: 0.88
-});
-for (let f = 0; f < 26; f++) {
-const fx = lerp(-30.5, 30.5, f / 25);
-const radius = 1.35 + hash2D(f, 3.7) * 0.75;
-const plume = new THREE.Mesh(new THREE.DodecahedronGeometry(radius, 1), foamMat);
-plume.position.set(fx, -1.65, 16.8 + (f % 3) * 1.4);
-plume.scale.set(1.4, 0.55, 1.3);
-plume.visible = false;
-waterGroup.add(plume);
-foamPlumes.push({
-mesh: plume,
-baseX: fx,
-baseZ: 16.8 + (f % 3) * 1.4,
-phase: f * 0.9
-});
-}
-// ---------------------------------------------------------
-// 8. Architectural 3D Dimension Lines (163 m Height & 1,210 m Span)
-// ---------------------------------------------------------
-const dimGroup = new THREE.Group();
-diorama.add(dimGroup);
-const dimMat = new THREE.MeshBasicMaterial({
-color: 0xd48324,
-transparent: true,
-opacity: 0
-});
-const heightBar = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 16.3, 8), dimMat);
-heightBar.position.set(-34.6, 4.95, 1.2);
-dimGroup.add(heightBar);
-const heightTickTop = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.25, 0.25), dimMat);
-heightTickTop.position.set(-34.6, 13.1, 1.2);
-dimGroup.add(heightTickTop);
-const heightTickBot = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.25, 0.25), dimMat);
-heightTickBot.position.set(-34.6, -3.2, 1.2);
-dimGroup.add(heightTickBot);
-const spanBar = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 121.0, 8), dimMat);
-spanBar.rotation.z = Math.PI / 2;
-spanBar.position.set(0, 16.4, 1.1);
-dimGroup.add(spanBar);
-[-60.5, 60.5].forEach((sx) => {
-const tick = new THREE.Mesh(new THREE.BoxGeometry(0.25, 2.2, 0.25), dimMat);
-tick.position.set(sx, 16.4, 1.1);
-dimGroup.add(tick);
-});
-// ---------------------------------------------------------
-// 9. Projected HTML Callouts & SVG Leader Lines
-// ---------------------------------------------------------
-const calloutsContainer = document.getElementById('callouts-container');
-const leaderSvg = document.getElementById('leader-svg');
-const finaleCard = document.getElementById('finale-card');
-const progressFill = document.getElementById('progress-fill');
-const stageLabelEls = Array.from(document.querySelectorAll('#stage-labels span'));
-const CALLOUT_DEFS = [
-{
-id: 'gorge',
-tag: 'Natural Site',
-title: 'Satpura & Vindhya Gorge',
-desc: 'Steep basalt canyon walls anchor the dam across the Narmada River',
-accent: '',
-anchor: new THREE.Vector3(-48, 22, -26),
-offsetX: -120,
-offsetY: -220,
-tIn: [0.6, 1.2],
-tOut: [4.4, 5.0]
-},
-{
-id: 'foundation',
-tag: 'Substructure',
-title: 'Deep Basalt Foundation',
-desc: 'Keyed into solid volcanic rock to resist massive water thrust',
-accent: 'accent-gold',
-anchor: new THREE.Vector3(-8, -2.5, 11),
-offsetX: -190,
-offsetY: 220,
-tIn: [1.3, 1.9],
-tOut: [4.7, 5.3]
-},
-{
-id: 'height',
-tag: 'Vertical Scale',
-title: '163 m Tall',
-desc: 'Above deepest foundation — one of India’s highest gravity dams',
-accent: 'accent-gold',
-anchor: new THREE.Vector3(-34.6, 7.5, 1.2),
-offsetX: -210,
-offsetY: -245,
-tIn: [3.8, 4.4],
-tOut: [8.8, 9.4]
-},
-{
-id: 'length',
-tag: 'Concrete Gravity Design',
-title: '1,210 m Long',
-desc: 'Stepped concrete gravity monoliths hold back water by sheer weight',
-accent: '',
-anchor: new THREE.Vector3(24, 15.8, 1.1),
-offsetX: 95,
-offsetY: -275,
-tIn: [4.4, 5.0],
-tOut: [9.2, 9.8]
-},
-{
-id: 'gates',
-tag: 'Flood Control',
-title: '30 Radial Spillway Gates',
-desc: 'Curved steel Tainter gates regulate peak monsoon river discharge',
-accent: 'accent-blue',
-anchor: new THREE.Vector3(-4, 12.2, 1.8),
-offsetX: -175,
-offsetY: -265,
-tIn: [7.1, 7.7],
-tOut: [12.3, 12.9]
-},
-{
-id: 'powerhouse',
-tag: 'Clean Hydropower',
-title: '1,450 MW Powerhouses',
-desc: 'Underground River Bed cavern (1,200 MW) + Canal Head (250 MW)',
-accent: 'accent-gold',
-anchor: new THREE.Vector3(47, 1.5, 9.5),
-offsetX: 60,
-offsetY: 235,
-tIn: [10.1, 10.7],
-tOut: [15.5, 16.1]
-},
-{
-id: 'reservoir',
-tag: 'Water Storage',
-title: 'Deep Teal Reservoir',
-desc: 'Impounds Narmada monsoon flow upstream between the two ranges',
-accent: '',
-anchor: new THREE.Vector3(-24, 10.5, -42),
-offsetX: -195,
-offsetY: -245,
-tIn: [13.1, 13.7],
-tOut: [16.5, 17.1]
-},
-{
-id: 'canal',
-tag: 'Irrigation Lifeline',
-title: 'Narmada Main Canal',
-desc: 'Feeds irrigation & drinking water across arid Gujarat',
-accent: 'accent-blue',
-anchor: new THREE.Vector3(53, 10.0, 46),
-offsetX: 55,
-offsetY: 225,
-tIn: [14.2, 14.8],
-tOut: [19.4, 20.0]
-}
-];
-const calloutNodes = CALLOUT_DEFS.map((def) => {
-const el = document.createElement('div');
-el.className = callout ${def.accent};
-el.innerHTML = <div class="callout-tag">${def.tag}</div> <div class="callout-title">${def.title}</div> <div class="callout-desc">${def.desc}</div>;
-el.style.opacity = '0';
-calloutsContainer.appendChild(el);
-const svgGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-svgGroup.style.opacity = '0';
-const lineGlow = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
-lineGlow.setAttribute('fill', 'none');
-lineGlow.setAttribute('stroke', 'rgba(255,255,255,0.9)');
-lineGlow.setAttribute('stroke-width', '7');
-lineGlow.setAttribute('stroke-linecap', 'round');
-lineGlow.setAttribute('stroke-linejoin', 'round');
-const lineMain = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
-lineMain.setAttribute('fill', 'none');
-lineMain.setAttribute('stroke', '#132129');
-lineMain.setAttribute('stroke-width', '3.2');
-lineMain.setAttribute('stroke-linecap', 'round');
-lineMain.setAttribute('stroke-linejoin', 'round');
-const dotOuter = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-dotOuter.setAttribute('r', '11');
-dotOuter.setAttribute('fill', 'rgba(255,255,255,0.92)');
-const dotInner = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-dotInner.setAttribute('r', '6');
-dotInner.setAttribute('fill', def.accent === 'accent-gold' ? '#d48324' : '#0d7480');
-svgGroup.appendChild(lineGlow);
-svgGroup.appendChild(lineMain);
-svgGroup.appendChild(dotOuter);
-svgGroup.appendChild(dotInner);
-leaderSvg.appendChild(svgGroup);
-return { def, el, svgGroup, lineGlow, lineMain, dotOuter, dotInner };
-});
-function projectToScreen(vec3) {
-const p = vec3.clone().project(camera);
-return {
-x: (p.x * 0.5 + 0.5) * WIDTH,
-y: (-p.y * 0.5 + 0.5) * HEIGHT
-};
-}
-// ---------------------------------------------------------
-// 10. Deterministic Frame Renderer
-// ---------------------------------------------------------
-const _camTarget = new THREE.Vector3(0, 3.5, 1.0);
-function renderFrame(rawT) {
-const t = clamp(Number(rawT) || 0, 0, window.DURATION);
-// Timeline Bar & Stage Highlight
-progressFill.style.width = ${(t / window.DURATION) * 100}%;
-const activeStage =
-t < 3.0 ? 0 :
-t < 6.8 ? 1 :
-t < 9.8 ? 2 :
-t < 13.0 ? 3 :
-t < 16.2 ? 4 : 5;
-stageLabelEls.forEach((span, idx) => {
-if (idx === activeStage) span.classList.add('active');
-else span.classList.remove('active');
-});
-// Foundation trench blocks drop in (1.0s - 2.6s)
-foundationBlocks.forEach((fb) => {
-const p = easeOutCubic((t - (1.0 + fb.delay)) / 0.85);
-fb.mesh.visible = p > 0.001;
-fb.mesh.position.y = lerp(fb.targetY + 14, fb.targetY, p);
-});
-const basinP = easeOutCubic((t - 1.9) / 0.9);
-stillingBasin.visible = basinP > 0.001;
-stillingBasin.position.y = lerp(12, 0, basinP);
-// Act 2: Concrete Gravity Dam Monoliths Assemble (2.9s - 6.1s)
-monolithItems.forEach((item) => {
-const startT = 2.9 + item.order * 2.1;
-const p = easeOutCubic((t - startT) / 0.95);
-item.mesh.visible = p > 0.001;
-item.mesh.position.y = lerp(24, item.targetY, p);
-});
-// 3D Dimension lines (163 m & 1,210 m)
-const dimOpacity = windowPulse(t, 3.9, 4.5, 8.9, 9.6);
-dimMat.opacity = dimOpacity;
-dimGroup.visible = dimOpacity > 0.01;
-heightBar.scale.y = easeOutCubic((t - 3.8) / 0.7) || 0.001;
-spanBar.scale.y = easeOutCubic((t - 4.3) / 0.7) || 0.001;
-// Act 3: Spillway Piers, Crest Deck & 30 Radial Gates (5.9s - 9.3s)
-const piersP = easeOutCubic((t - 5.8) / 0.9);
-piersAndDeckGroup.visible = piersP > 0.001;
-piersAndDeckGroup.position.y = lerp(18, 0, piersP);
-const spillwayOpenP = easeInOutCubic((t - 16.2) / 1.5);
-radialGates.forEach((g) => {
-const installStart = 6.6 + (g.index / NUM_GATES) * 1.9;
-const installP = easeOutCubic((t - installStart) / 0.65);
-g.pivot.visible = installP > 0.001;
-g.pivot.position.y = lerp(g.baseY + 14, g.baseY, installP);
-g.pivot.rotation.x = -spillwayOpenP * 0.62;
-});
-// Act 4: Underground Hydroelectric Powerhouses (9.7s - 12.7s)
-const phP = easeOutCubic((t - 9.7) / 1.1);
-powerhouseGroup.visible = phP > 0.001;
-cavernLight.intensity = phP * (2.6 + Math.sin(t * 4.0) * 0.25);
-turbineUnits.forEach((u) => {
-const uStart = 10.0 + u.index * 0.28;
-const up = easeOutCubic((t - uStart) / 0.85);
-u.group.visible = up > 0.001;
-u.group.position.y = lerp(u.targetY + 11, u.targetY, up);
-u.penstock.visible = up > 0.05;
-u.penstock.scale.y = clamp(up * 1.15, 0.01, 1);
-const spinFactor = smoothstep(11.4, 12.9, t);
-u.rotor.rotation.y = t * 7.5 * spinFactor + u.index * 0.5;
-});
-const chphP = easeOutCubic((t - 11.1) / 0.9);
-chphGroup.visible = chphP > 0.001;
-chphGroup.position.y = lerp(12, 0, chphP);
-// Act 5 & 6: Water Filling, Narmada Main Canal & Spillway Cascades
-waterNormalTex.offset.set(t * 0.028, -t * 0.052);
-cascadeTex.offset.set(0, -t * 1.45);
-const riverRise = spillwayOpenP * 0.75;
-downstreamRiverMesh.position.y = riverRise;
-downstreamRiverMesh.scale.x = 1 + spillwayOpenP * 0.14;
-const resFillP = easeInOutCubic((t - 12.8) / 2.6);
-const topWaterY = lerp(-2.25, 11.15, resFillP) - spillwayOpenP * 0.25;
-reservoirBox.position.y = topWaterY - 15.5 * 0.5;
-const canalFillP = easeOutCubic((t - 14.2) / 1.2);
-canalWaterMesh.visible = canalFillP > 0.01;
-canalWaterMesh.position.y = lerp(-1.45, 0.0, canalFillP);
-canalWaterMesh.material.opacity = canalFillP * 0.94;
-const cascadeP = easeOutCubic((t - 16.35) / 0.85);
-cascadeSheets.forEach((sheet, idx) => {
-sheet.visible = cascadeP > 0.01;
-if (sheet.visible) {
-const wave = 1 + Math.sin(t * 9.0 + idx * 0.7) * 0.03;
-sheet.scale.set(1, cascadeP * wave, 1);
-}
-});
-foamPlumes.forEach((fp) => {
-fp.mesh.visible = cascadeP > 0.15;
-if (fp.mesh.visible) {
-const bounce = Math.sin(t * 8.5 + fp.phase) * 0.22;
-fp.mesh.position.y = -1.65 + cascadeP * 0.55 + bounce;
-const s = (0.7 + cascadeP * 0.65) * (1 + Math.sin(t * 7.0 + fp.phase) * 0.12);
-fp.mesh.scale.set(1.45 * s, 0.62 * s, 1.35 * s);
-fp.mesh.rotation.y = t * 1.8 + fp.phase;
-}
-});
-// Cinematic Slowly Orbiting Aerial Camera
-let azimuth;
-if (t < 10.0) {
-azimuth = lerp(-0.52, 0.18, easeInOutCubic(t / 10.0));
-} else if (t < 16.0) {
-azimuth = lerp(0.18, 0.62, easeInOutCubic((t - 10.0) / 6.0));
-} else {
-azimuth = lerp(0.62, 0.24, easeInOutCubic((t - 16.0) / 4.0));
-}
-const radius =
-t < 10.0 ? lerp(312, 286, easeInOutCubic(t / 10.0)) :
-t < 16.0 ? lerp(286, 294, easeInOutCubic((t - 10.0) / 6.0)) :
-lerp(294, 308, easeInOutCubic((t - 16.0) / 4.0));
-const camY =
-t < 8.0 ? lerp(205, 166, easeInOutCubic(t / 8.0)) :
-t < 14.0 ? lerp(166, 178, easeInOutCubic((t - 8.0) / 6.0)) :
-lerp(178, 198, easeInOutCubic((t - 14.0) / 6.0));
-camera.position.set(
-Math.sin(azimuth) * radius,
-camY,
-Math.cos(azimuth) * radius
-);
-camera.lookAt(_camTarget);
-camera.updateMatrixWorld();
-// Update Projected Callout Cards & SVG Leader Lines
-calloutNodes.forEach(({ def, el, svgGroup, lineGlow, lineMain, dotOuter, dotInner }) => {
-const vis = windowPulse(t, def.tIn[0], def.tIn[1], def.tOut[0], def.tOut[1]);
-if (vis <= 0.01) {
-el.style.opacity = '0';
-svgGroup.style.opacity = '0';
-return;
-}
-const pt = projectToScreen(def.anchor);
-const cardW = el.offsetWidth || 330;
-const cardH = el.offsetHeight || 120;
-const rawLeft = pt.x + def.offsetX - cardW * 0.5;
-const rawTop = pt.y + def.offsetY - cardH * 0.5;
-const cardLeft = clamp(rawLeft, 48, WIDTH - 48 - cardW);
-const cardTop = clamp(rawTop, 300, HEIGHT - 220 - cardH);
-const slideY = (1 - vis) * 14;
-el.style.opacity = vis.toFixed(3);
-el.style.transform = translate3d(${cardLeft.toFixed(1)}px, ${(cardTop + slideY).toFixed(1)}px, 0);
-const attachY = pt.y < cardTop + cardH * 0.5 ? cardTop : cardTop + cardH;
-const attachX = clamp(pt.x, cardLeft + 36, cardLeft + cardW - 36);
-const midY = lerp(pt.y, attachY, 0.55);
-const ptsStr = ${pt.x.toFixed(1)},${pt.y.toFixed(1)} ${attachX.toFixed(1)},${midY.toFixed(1)} ${attachX.toFixed(1)},${attachY.toFixed(1)};
-lineGlow.setAttribute('points', ptsStr);
-lineMain.setAttribute('points', ptsStr);
-dotOuter.setAttribute('cx', pt.x.toFixed(1));
-dotOuter.setAttribute('cy', pt.y.toFixed(1));
-dotInner.setAttribute('cx', pt.x.toFixed(1));
-dotInner.setAttribute('cy', pt.y.toFixed(1));
-svgGroup.style.opacity = vis.toFixed(3);
-});
-// Finale Milestone Card (16.8s - 20.0s)
-const finaleVis = smoothstep(16.8, 17.5, t);
-finaleCard.style.opacity = finaleVis.toFixed(3);
-finaleCard.style.transform = translate3d(0, ${((1 - finaleVis) * 18).toFixed(1)}px, 0);
-renderer.render(scene, camera);
-}
-// ---------------------------------------------------------
-// 11. Deterministic API + Auto-Start Preview (Zero requestAnimationFrame)
-// ---------------------------------------------------------
-let previewTimer = null;
-function stopPreview() {
-if (previewTimer !== null) {
-clearTimeout(previewTimer);
-previewTimer = null;
-}
-}
-window.renderAt = function renderAt(t) {
-window.__externalControlled = true;
-stopPreview();
-renderFrame(t);
-};
-if (window.__externalControlled && window.__queuedT !== null) {
-renderFrame(window.__queuedT);
-} else {
-renderFrame(0);
-const startTime = performance.now();
-const tickPreview = () => {
-if (window.__externalControlled) {
-stopPreview();
-return;
-}
-const elapsed = ((performance.now() - startTime) / 1000) % window.DURATION;
-renderFrame(elapsed);
-previewTimer = setTimeout(tickPreview, 1000 / 30);
-};
-previewTimer = setTimeout(tickPreview, 1000 / 30);
-}
-</script>
+  <div id="stage">
+    <canvas id="scene-canvas" width="1080" height="1920"></canvas>
+    <svg id="leader-svg" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div id="ui-layer">
+      <div class="header-box" id="header-box">
+        <div class="kicker-row">
+          <span class="kicker-pill"><span class="kicker-dot"></span>3D Engineering Breakdown</span>
+          <span class="location-pill">Kevadia, Gujarat, India</span>
+        </div>
+        <h1 class="main-title">How Narmada Dam Was Designed</h1>
+        <div class="sub-title">Sardar Sarovar Concrete Gravity Dam • Narmada River</div>
+      </div>
+
+      <div id="callouts-container"></div>
+
+      <div id="finale-card">
+        <div class="finale-top">
+          <span class="finale-badge">Inaugurated 2017</span>
+          <span class="finale-note">Sardar Sarovar Dam • Gujarat, India</span>
+        </div>
+        <div class="finale-grid">
+          <div class="stat-cell">
+            <div class="stat-val">163 m</div>
+            <div class="stat-lbl">Height</div>
+          </div>
+          <div class="stat-cell">
+            <div class="stat-val">1,210 m</div>
+            <div class="stat-lbl">Length</div>
+          </div>
+          <div class="stat-cell">
+            <div class="stat-val">30</div>
+            <div class="stat-lbl">Radial Gates</div>
+          </div>
+          <div class="stat-cell">
+            <div class="stat-val">1,450 MW</div>
+            <div class="stat-lbl">Hydropower</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="load-fallback">
+        <strong>Waiting for Three.js 0.160.0 Module</strong>
+        Ensure an internet connection is active to load <code>three.module.min.js</code> from cdnjs, and serve over <code>http://localhost</code> if your browser blocks <code>importmap</code> over <code>file://</code>.
+      </div>
+
+      <div class="timeline-box">
+        <div class="timeline-header">
+          <div class="stage-labels" id="stage-labels">
+            <span data-step="0">01 Gorge</span>
+            <span data-step="1">02 Gravity Dam</span>
+            <span data-step="2">03 30 Gates</span>
+            <span data-step="3">04 1,450 MW</span>
+            <span data-step="4">05 Reservoir &amp; Canal</span>
+            <span data-step="5">06 2017 Spillway</span>
+          </div>
+          <button id="play-toggle" type="button">Pause</button>
+        </div>
+        <div class="progress-track" id="progress-track">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import * as THREE from 'three';
+
+    window.__threeReady = true;
+    const fallbackEl = document.getElementById('load-fallback');
+    if (fallbackEl) fallbackEl.style.display = 'none';
+
+    window.DURATION = 20;
+
+    // ---------------------------------------------------------
+    // Deterministic Math & Easing Utilities
+    // ---------------------------------------------------------
+    const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+    const lerp = (a, b, t) => a + (b - a) * t;
+    const smoothstep = (e0, e1, x) => {
+      const t = clamp((x - e0) / (e1 - e0), 0, 1);
+      return t * t * (3 - 2 * t);
+    };
+    const easeOutCubic = (t) => 1 - Math.pow(1 - clamp(t, 0, 1), 3);
+    const easeInOutCubic = (t) => {
+      const x = clamp(t, 0, 1);
+      return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+    };
+    const windowPulse = (t, inStart, inEnd, outStart, outEnd) => {
+      const a = smoothstep(inStart, inEnd, t);
+      const b = 1 - smoothstep(outStart, outEnd, t);
+      return a * b;
+    };
+
+    function hash2D(ix, iz) {
+      const n = Math.sin(ix * 127.1 + iz * 311.7) * 43758.5453123;
+      return n - Math.floor(n);
+    }
+
+    // ---------------------------------------------------------
+    // Renderer, Scene & Camera (Exact 1080x1920 Portrait)
+    // ---------------------------------------------------------
+    const WIDTH = 1080;
+    const HEIGHT = 1920;
+    const canvas = document.getElementById('scene-canvas');
+
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: true,
+      alpha: true,
+      powerPreference: 'default'
+    });
+    renderer.setPixelRatio(1);
+    renderer.setSize(WIDTH, HEIGHT, false);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.06;
+
+    const scene = new THREE.Scene();
+
+    const camera = new THREE.PerspectiveCamera(45, WIDTH / HEIGHT, 1, 1400);
+    camera.position.set(-140, 205, 270);
+
+    // ---------------------------------------------------------
+    // Architectural Studio Lighting
+    // ---------------------------------------------------------
+    const hemiLight = new THREE.HemisphereLight(0xe4f3ff, 0xc3a684, 1.15);
+    hemiLight.position.set(0, 140, 0);
+    scene.add(hemiLight);
+
+    const sunLight = new THREE.DirectionalLight(0xfff4e0, 2.35);
+    sunLight.position.set(-85, 135, 72);
+    sunLight.castShadow = true;
+    sunLight.shadow.mapSize.width = 2048;
+    sunLight.shadow.mapSize.height = 2048;
+    sunLight.shadow.camera.near = 20;
+    sunLight.shadow.camera.far = 340;
+    sunLight.shadow.camera.left = -105;
+    sunLight.shadow.camera.right = 105;
+    sunLight.shadow.camera.top = 105;
+    sunLight.shadow.camera.bottom = -105;
+    sunLight.shadow.bias = -0.0005;
+    sunLight.shadow.normalBias = 0.03;
+    scene.add(sunLight);
+
+    const rimLight = new THREE.DirectionalLight(0xffe1b8, 0.65);
+    rimLight.position.set(95, 70, -90);
+    scene.add(rimLight);
+
+    const cavernLight = new THREE.PointLight(0xffbe6b, 0, 38, 1.6);
+    cavernLight.position.set(47, 1.5, 9);
+    scene.add(cavernLight);
+
+    // ---------------------------------------------------------
+    // Procedural Canvas Textures (Self-Contained, Zero External URLs)
+    // ---------------------------------------------------------
+    function createConcreteTexture() {
+      const c = document.createElement('canvas');
+      c.width = 256;
+      c.height = 256;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#e5e8eb';
+      ctx.fillRect(0, 0, 256, 256);
+
+      ctx.strokeStyle = 'rgba(130, 140, 150, 0.16)';
+      ctx.lineWidth = 1;
+      for (let y = 0; y < 256; y += 32) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(256, y);
+        ctx.stroke();
+      }
+      for (let x = 0; x < 256; x += 64) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, 256);
+        ctx.stroke();
+      }
+
+      for (let i = 0; i < 1800; i++) {
+        const px = Math.floor(hash2D(i, 1.3) * 256);
+        const py = Math.floor(hash2D(i, 7.9) * 256);
+        const shade = hash2D(i, 3.1) > 0.5 ? 'rgba(255,255,255,0.22)' : 'rgba(95,105,115,0.14)';
+        ctx.fillStyle = shade;
+        ctx.fillRect(px, py, 2, 2);
+      }
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(3, 3);
+      return tex;
+    }
+
+    function createWaterNormalTexture() {
+      const c = document.createElement('canvas');
+      c.width = 256;
+      c.height = 256;
+      const ctx = c.getContext('2d');
+      const img = ctx.createImageData(256, 256);
+      for (let y = 0; y < 256; y++) {
+        for (let x = 0; x < 256; x++) {
+          const u = (x / 256) * Math.PI * 2;
+          const v = (y / 256) * Math.PI * 2;
+          const nx = Math.sin(u * 4 + Math.cos(v * 3)) * 0.35 + Math.cos(u * 8 - v * 6) * 0.15;
+          const ny = Math.cos(v * 5 + Math.sin(u * 4)) * 0.35 + Math.sin(u * 6 + v * 9) * 0.15;
+          const idx = (y * 256 + x) * 4;
+          img.data[idx] = Math.floor((nx * 0.5 + 0.5) * 255);
+          img.data[idx + 1] = Math.floor((ny * 0.5 + 0.5) * 255);
+          img.data[idx + 2] = 240;
+          img.data[idx + 3] = 255;
+        }
+      }
+      ctx.putImageData(img, 0, 0);
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(7, 7);
+      return tex;
+    }
+
+    function createCascadeTexture() {
+      const c = document.createElement('canvas');
+      c.width = 256;
+      c.height = 256;
+      const ctx = c.getContext('2d');
+      const grad = ctx.createLinearGradient(0, 0, 0, 256);
+      grad.addColorStop(0, '#1fa5b3');
+      grad.addColorStop(0.35, '#86e2ec');
+      grad.addColorStop(0.75, '#e8fbff');
+      grad.addColorStop(1, '#ffffff');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 256, 256);
+
+      for (let i = 0; i < 420; i++) {
+        const x = hash2D(i, 2.1) * 256;
+        const y = hash2D(i, 5.4) * 256;
+        const h = 18 + hash2D(i, 8.7) * 44;
+        const w = 1.5 + hash2D(i, 4.2) * 3.0;
+        ctx.fillStyle = hash2D(i, 9.5) > 0.35 ? 'rgba(255,255,255,0.52)' : 'rgba(20,148,163,0.34)';
+        ctx.fillRect(x, y, w, h);
+      }
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(6, 2);
+      return tex;
+    }
+
+    const concreteTex = createConcreteTexture();
+    const waterNormalTex = createWaterNormalTexture();
+    const cascadeTex = createCascadeTexture();
+
+    const concreteMat = new THREE.MeshStandardMaterial({
+      color: 0xe7eaed,
+      map: concreteTex,
+      roughness: 0.72,
+      metalness: 0.04
+    });
+
+    const concreteTrimMat = new THREE.MeshStandardMaterial({
+      color: 0xcfd5db,
+      map: concreteTex,
+      roughness: 0.68,
+      metalness: 0.06
+    });
+
+    const foundationMat = new THREE.MeshStandardMaterial({
+      color: 0x9aa2aa,
+      roughness: 0.85,
+      metalness: 0.05
+    });
+
+    const steelGateMat = new THREE.MeshStandardMaterial({
+      color: 0x2b3945,
+      roughness: 0.38,
+      metalness: 0.65,
+      side: THREE.DoubleSide
+    });
+
+    const steelRibMat = new THREE.MeshStandardMaterial({
+      color: 0x4b5f70,
+      roughness: 0.42,
+      metalness: 0.55
+    });
+
+    const turbineBlueMat = new THREE.MeshStandardMaterial({
+      color: 0x166896,
+      roughness: 0.35,
+      metalness: 0.45
+    });
+
+    const turbineGoldMat = new THREE.MeshStandardMaterial({
+      color: 0xe39b32,
+      emissive: 0x5c3405,
+      emissiveIntensity: 0.45,
+      roughness: 0.3,
+      metalness: 0.7
+    });
+
+    // ---------------------------------------------------------
+    // Root Diorama Container
+    // ---------------------------------------------------------
+    const diorama = new THREE.Group();
+    scene.add(diorama);
+
+    const shadowPlane = new THREE.Mesh(
+      new THREE.PlaneGeometry(186, 210),
+      new THREE.MeshBasicMaterial({
+        color: 0x5d5142,
+        transparent: true,
+        opacity: 0.14
+      })
+    );
+    shadowPlane.rotation.x = -Math.PI / 2;
+    shadowPlane.position.set(2, -13.1, 2);
+    scene.add(shadowPlane);
+
+    // ---------------------------------------------------------
+    // 1. Low-Poly Satpura & Vindhya Gorge Terrain + Cutaway Plinth
+    // ---------------------------------------------------------
+    function getRiverCenterX(z) {
+      if (z <= 0) {
+        return Math.sin(z * 0.032) * 6.5;
+      }
+      return Math.sin(z * 0.042) * 8.5 - z * 0.07;
+    }
+
+    function getCanalCenterX(z) {
+      const t = clamp((z + 14) / 102, 0, 1);
+      return 45.5 + Math.sin(t * Math.PI * 0.85) * 6.5 + t * 5.0;
+    }
+
+    function getTerrainHeight(x, z) {
+      const rcx = getRiverCenterX(z);
+      const distRiver = Math.abs(x - rcx);
+
+      const canyonT = smoothstep(8.5, 34.0, distRiver);
+      let h = lerp(-3.8, 13.8, canyonT);
+
+      const hillMask = smoothstep(23.0, 46.0, distRiver);
+      const ridge1 = Math.sin(x * 0.055 + 0.6) * Math.cos(z * 0.048 - 0.3) * 9.5;
+      const ridge2 = Math.sin(x * 0.11 - z * 0.085) * 4.2;
+      const ridge3 = Math.cos(x * 0.18 + z * 0.16) * 1.8;
+      const peakBoost = smoothstep(32.0, 74.0, Math.abs(x)) * 8.5;
+
+      const upstreamBasin = z < -4 ? smoothstep(-4, -55, z) * (1 - smoothstep(16, 48, distRiver)) * 4.5 : 0;
+
+      h += hillMask * (ridge1 + ridge2 + ridge3 + peakBoost) - upstreamBasin;
+
+      if (z >= -18) {
+        const ccx = getCanalCenterX(z);
+        const distCanal = Math.abs(x - ccx);
+        const canalBench = 1 - smoothstep(3.2, 8.5, distCanal);
+        const canalTrench = 1 - smoothstep(1.6, 3.3, distCanal);
+        h = lerp(h, 10.6, canalBench * 0.92);
+        h = lerp(h, 8.4, canalTrench);
+      }
+
+      if (x >= 35.0 && x <= 62.0 && z >= -3.0 && z <= 22.0) {
+        const edgeX = Math.min(smoothstep(35.0, 36.5, x), 1 - smoothstep(60.5, 62.0, x));
+        const edgeZ = Math.min(smoothstep(-3.0, -1.5, z), 1 - smoothstep(20.5, 22.0, z));
+        h = lerp(h, -4.8, edgeX * edgeZ);
+      }
+
+      return h;
+    }
+
+    function buildTerrain() {
+      const group = new THREE.Group();
+      const segX = 152;
+      const segZ = 176;
+      const minX = -76, maxX = 76;
+      const minZ = -88, maxZ = 88;
+
+      const planeGeom = new THREE.PlaneGeometry(maxX - minX, maxZ - minZ, segX, segZ);
+      planeGeom.rotateX(-Math.PI / 2);
+
+      const pos = planeGeom.attributes.position;
+      for (let i = 0; i < pos.count; i++) {
+        let vx = pos.getX(i);
+        let vz = pos.getZ(i);
+
+        const isBorder = Math.abs(vx) > 74.8 || Math.abs(vz) > 86.8;
+        const nearDam = Math.abs(vz - 4) < 16;
+        const nearCanal = vz > -20 && Math.abs(vx - getCanalCenterX(vz)) < 9.5;
+        const nearCutaway = vx > 33 && vx < 64 && vz > -5 && vz < 24;
+
+        if (!isBorder && !nearDam && !nearCanal && !nearCutaway) {
+          vx += (hash2D(vx, vz) - 0.5) * 0.34;
+          vz += (hash2D(vz, vx) - 0.5) * 0.34;
+        }
+
+        const vy = getTerrainHeight(vx, vz);
+        pos.setXYZ(i, vx, vy, vz);
+      }
+
+      const nonIndexed = planeGeom.toNonIndexed();
+      nonIndexed.computeVertexNormals();
+
+      const nPos = nonIndexed.attributes.position;
+      const nNorm = nonIndexed.attributes.normal;
+      const colors = new Float32Array(nPos.count * 3);
+
+      const colRiverRock = new THREE.Color(0x697078);
+      const colSandstoneWarm = new THREE.Color(0xdcb88d);
+      const colSandstoneDeep = new THREE.Color(0xc59867);
+      const colSageLight = new THREE.Color(0x9bb386);
+      const colSageRich = new THREE.Color(0x7c9769);
+      const colCutawayFloor = new THREE.Color(0x525860);
+      const tmpColor = new THREE.Color();
+
+      for (let i = 0; i < nPos.count; i += 3) {
+        const cx = (nPos.getX(i) + nPos.getX(i + 1) + nPos.getX(i + 2)) / 3;
+        const cy = (nPos.getY(i) + nPos.getY(i + 1) + nPos.getY(i + 2)) / 3;
+        const cz = (nPos.getZ(i) + nPos.getZ(i + 1) + nPos.getZ(i + 2)) / 3;
+        const ny = nNorm.getY(i);
+
+        const inCutaway = cx >= 35.2 && cx <= 61.8 && cz >= -2.8 && cz <= 21.8 && cy < -3.0;
+        const facetVar = (hash2D(cx * 1.7, cz * 1.7) - 0.5) * 0.06;
+
+        if (inCutaway) {
+          tmpColor.copy(colCutawayFloor);
+        } else if (cy < 2.2) {
+          const t = smoothstep(-3.8, 2.2, cy);
+          tmpColor.copy(colRiverRock).lerp(colSandstoneDeep, t);
+        } else if (cy < 11.5) {
+          const t = smoothstep(2.2, 11.5, cy);
+          tmpColor.copy(colSandstoneDeep).lerp(colSandstoneWarm, t);
+          if (ny > 0.86 && cy > 8.5) {
+            tmpColor.lerp(colSageLight, 0.45);
+          }
+        } else {
+          const slopeGreen = smoothstep(0.72, 0.95, ny);
+          const elevGreen = smoothstep(11.5, 22.0, cy);
+          const gMix = clamp(slopeGreen * 0.78 + elevGreen * 0.35, 0, 1);
+          tmpColor.copy(colSandstoneWarm).lerp(colSageLight, gMix);
+          tmpColor.lerp(colSageRich, smoothstep(18.0, 29.0, cy) * 0.55);
+        }
+
+        tmpColor.offsetHSL(0, 0, facetVar);
+
+        for (let k = 0; k < 3; k++) {
+          colors[(i + k) * 3] = tmpColor.r;
+          colors[(i + k) * 3 + 1] = tmpColor.g;
+          colors[(i + k) * 3 + 2] = tmpColor.b;
+        }
+      }
+
+      nonIndexed.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+      const terrainMat = new THREE.MeshStandardMaterial({
+        vertexColors: true,
+        roughness: 0.86,
+        metalness: 0.02,
+        flatShading: true
+      });
+
+      const terrainMesh = new THREE.Mesh(nonIndexed, terrainMat);
+      terrainMesh.receiveShadow = true;
+      terrainMesh.castShadow = true;
+      group.add(terrainMesh);
+
+      const baseBottomY = -10.8;
+      const skirtGeo = new THREE.BufferGeometry();
+      const skirtVerts = [];
+      const skirtCols = [];
+
+      const strataTop = new THREE.Color(0xd2ad82);
+      const strataMid = new THREE.Color(0xb8895a);
+      const strataDeep = new THREE.Color(0x6d6764);
+
+      function addSkirtQuad(x0, z0, x1, z1) {
+        const y0 = getTerrainHeight(x0, z0);
+        const y1 = getTerrainHeight(x1, z1);
+        const midY = (y0 + y1) * 0.5;
+        const topCol = midY > 11 ? strataTop : strataMid;
+
+        skirtVerts.push(x0, y0, z0, x0, baseBottomY, z0, x1, y1, z1);
+        skirtCols.push(
+          topCol.r, topCol.g, topCol.b,
+          strataDeep.r, strataDeep.g, strataDeep.b,
+          topCol.r, topCol.g, topCol.b
+        );
+        skirtVerts.push(x1, y1, z1, x0, baseBottomY, z0, x1, baseBottomY, z1);
+        skirtCols.push(
+          topCol.r, topCol.g, topCol.b,
+          strataDeep.r, strataDeep.g, strataDeep.b,
+          strataDeep.r, strataDeep.g, strataDeep.b
+        );
+      }
+
+      const stepX = (maxX - minX) / segX;
+      const stepZ = (maxZ - minZ) / segZ;
+
+      for (let i = 0; i < segX; i++) {
+        addSkirtQuad(minX + i * stepX, maxZ, minX + (i + 1) * stepX, maxZ);
+      }
+      for (let i = 0; i < segX; i++) {
+        addSkirtQuad(minX + (i + 1) * stepX, minZ, minX + i * stepX, minZ);
+      }
+      for (let j = 0; j < segZ; j++) {
+        addSkirtQuad(minX, minZ + j * stepZ, minX, minZ + (j + 1) * stepZ);
+      }
+      for (let j = 0; j < segZ; j++) {
+        addSkirtQuad(maxX, minZ + (j + 1) * stepZ, maxX, minZ + j * stepZ);
+      }
+
+      skirtGeo.setAttribute('position', new THREE.Float32BufferAttribute(skirtVerts, 3));
+      skirtGeo.setAttribute('color', new THREE.Float32BufferAttribute(skirtCols, 3));
+      skirtGeo.computeVertexNormals();
+
+      const skirtMat = new THREE.MeshStandardMaterial({
+        vertexColors: true,
+        roughness: 0.88,
+        metalness: 0.02,
+        flatShading: true
+      });
+      const skirtMesh = new THREE.Mesh(skirtGeo, skirtMat);
+      skirtMesh.receiveShadow = true;
+      group.add(skirtMesh);
+
+      const plinth = new THREE.Mesh(
+        new THREE.BoxGeometry(154.4, 2.0, 178.4),
+        new THREE.MeshStandardMaterial({
+          color: 0x263138,
+          roughness: 0.65,
+          metalness: 0.15
+        })
+      );
+      plinth.position.set(0, -11.8, 0);
+      plinth.receiveShadow = true;
+      group.add(plinth);
+
+      const plinthTrim = new THREE.Mesh(
+        new THREE.BoxGeometry(155.0, 0.35, 179.0),
+        new THREE.MeshStandardMaterial({
+          color: 0xc59b63,
+          roughness: 0.45,
+          metalness: 0.35
+        })
+      );
+      plinthTrim.position.set(0, -10.75, 0);
+      group.add(plinthTrim);
+
+      return group;
+    }
+
+    const terrainGroup = buildTerrain();
+    diorama.add(terrainGroup);
+
+    // ---------------------------------------------------------
+    // 2. Foundation Trench & Stilling Basin Apron
+    // ---------------------------------------------------------
+    const foundationGroup = new THREE.Group();
+    diorama.add(foundationGroup);
+
+    const foundationBlocks = [];
+    const numFndBlocks = 20;
+    for (let i = 0; i < numFndBlocks; i++) {
+      const bx = lerp(-56, 56, i / (numFndBlocks - 1));
+      const block = new THREE.Mesh(
+        new THREE.BoxGeometry(5.8, 2.2, 16.2),
+        foundationMat
+      );
+      block.position.set(bx, -3.5, 7.6);
+      block.castShadow = true;
+      block.receiveShadow = true;
+      foundationGroup.add(block);
+      foundationBlocks.push({
+        mesh: block,
+        targetY: -3.5,
+        delay: Math.abs(bx) / 60 * 0.55
+      });
+    }
+
+    const stillingBasin = new THREE.Group();
+    const basinFloor = new THREE.Mesh(
+      new THREE.BoxGeometry(68, 1.4, 13.5),
+      concreteTrimMat
+    );
+    basinFloor.position.set(0, -3.1, 21.5);
+    basinFloor.receiveShadow = true;
+    stillingBasin.add(basinFloor);
+
+    [-33.6, 33.6].forEach((wx) => {
+      const wall = new THREE.Mesh(
+        new THREE.BoxGeometry(1.1, 5.2, 14.5),
+        concreteMat
+      );
+      wall.position.set(wx, -0.6, 21.5);
+      wall.castShadow = true;
+      wall.receiveShadow = true;
+      stillingBasin.add(wall);
+    });
+
+    for (let i = 0; i < 15; i++) {
+      const bx = -28 + i * 4.0;
+      const baffle = new THREE.Mesh(
+        new THREE.BoxGeometry(1.6, 1.3, 1.6),
+        concreteMat
+      );
+      baffle.position.set(bx, -2.0, 21.0);
+      baffle.castShadow = true;
+      stillingBasin.add(baffle);
+    }
+    foundationGroup.add(stillingBasin);
+
+    // ---------------------------------------------------------
+    // 3. Stepped Concrete Gravity Dam Monoliths (1,210 m long, 163 m tall)
+    // ---------------------------------------------------------
+    const monolithsGroup = new THREE.Group();
+    diorama.add(monolithsGroup);
+
+    function createSpillwaySectionGeometry(width) {
+      const s = new THREE.Shape();
+      s.moveTo(0.0, -3.2);
+      s.lineTo(0.0, 10.25);
+      s.quadraticCurveTo(-0.55, 10.58, -1.45, 9.75);
+      s.lineTo(-13.2, -1.6);
+      s.quadraticCurveTo(-14.6, -2.35, -15.8, -1.45);
+      s.lineTo(-15.8, -3.2);
+      s.closePath();
+
+      const geom = new THREE.ExtrudeGeometry(s, {
+        depth: width,
+        bevelEnabled: false,
+        curveSegments: 12
+      });
+      geom.rotateY(Math.PI / 2);
+      geom.translate(-width * 0.5, 0, 0);
+      geom.computeVertexNormals();
+      return geom;
+    }
+
+    function createNonOverflowSectionGeometry(width) {
+      const s = new THREE.Shape();
+      s.moveTo(0.4, -3.2);
+      s.lineTo(0.0, 13.1);
+      s.lineTo(-2.1, 13.1);
+      s.lineTo(-15.2, -3.2);
+      s.closePath();
+
+      const geom = new THREE.ExtrudeGeometry(s, {
+        depth: width,
+        bevelEnabled: false
+      });
+      geom.rotateY(Math.PI / 2);
+      geom.translate(-width * 0.5, 0, 0);
+      geom.computeVertexNormals();
+      return geom;
+    }
+
+    const monolithItems = [];
+    const leftCount = 6;
+    const leftStart = -60.5;
+    const leftEnd = -33.2;
+    const leftW = (leftEnd - leftStart) / leftCount;
+    const leftGeom = createNonOverflowSectionGeometry(leftW - 0.14);
+
+    for (let i = 0; i < leftCount; i++) {
+      const cx = leftStart + (i + 0.5) * leftW;
+      const m = new THREE.Mesh(leftGeom, i % 2 === 0 ? concreteMat : concreteTrimMat);
+      m.position.set(cx, 0, 0);
+      m.castShadow = true;
+      m.receiveShadow = true;
+      monolithsGroup.add(m);
+      monolithItems.push({
+        mesh: m,
+        targetY: 0,
+        order: i * 0.045
+      });
+    }
+
+    const centerCount = 15;
+    const centerSpan = 66.4;
+    const centerW = centerSpan / centerCount;
+    const centerGeom = createSpillwaySectionGeometry(centerW - 0.12);
+
+    for (let i = 0; i < centerCount; i++) {
+      const cx = -33.2 + (i + 0.5) * centerW;
+      const m = new THREE.Mesh(centerGeom, i % 2 === 0 ? concreteMat : concreteTrimMat);
+      m.position.set(cx, 0, 0);
+      m.castShadow = true;
+      m.receiveShadow = true;
+      monolithsGroup.add(m);
+      monolithItems.push({
+        mesh: m,
+        targetY: 0,
+        order: 0.25 + (1 - Math.abs(cx) / 34) * 0.35
+      });
+    }
+
+    const rightCount = 6;
+    const rightStart = 33.2;
+    const rightEnd = 60.5;
+    const rightW = (rightEnd - rightStart) / rightCount;
+    const rightGeom = createNonOverflowSectionGeometry(rightW - 0.14);
+
+    for (let i = 0; i < rightCount; i++) {
+      const cx = rightStart + (i + 0.5) * rightW;
+      const m = new THREE.Mesh(rightGeom, i % 2 === 0 ? concreteMat : concreteTrimMat);
+      m.position.set(cx, 0, 0);
+      m.castShadow = true;
+      m.receiveShadow = true;
+      monolithsGroup.add(m);
+      monolithItems.push({
+        mesh: m,
+        targetY: 0,
+        order: (rightCount - 1 - i) * 0.045
+      });
+    }
+
+    // ---------------------------------------------------------
+    // 4. 31 Spillway Piers, Crest Roadway Bridge & 30 Radial Gates
+    // ---------------------------------------------------------
+    const piersAndDeckGroup = new THREE.Group();
+    diorama.add(piersAndDeckGroup);
+
+    const NUM_GATES = 30;
+    const spillwayLeft = -33.0;
+    const spillwayRight = 33.0;
+    const bayPitch = (spillwayRight - spillwayLeft) / NUM_GATES;
+
+    const pierGeom = new THREE.BoxGeometry(0.42, 4.4, 6.2);
+    for (let p = 0; p <= NUM_GATES; p++) {
+      const px = spillwayLeft + p * bayPitch;
+      const pier = new THREE.Mesh(pierGeom, concreteMat);
+      pier.position.set(px, 11.7, 2.5);
+      pier.castShadow = true;
+      pier.receiveShadow = true;
+      piersAndDeckGroup.add(pier);
+    }
+
+    const crestDeck = new THREE.Mesh(
+      new THREE.BoxGeometry(121.0, 0.55, 2.6),
+      concreteMat
+    );
+    crestDeck.position.set(0, 13.7, 1.3);
+    crestDeck.castShadow = true;
+    crestDeck.receiveShadow = true;
+    piersAndDeckGroup.add(crestDeck);
+
+    [-0.1, 2.5].forEach((pz) => {
+      const parapet = new THREE.Mesh(
+        new THREE.BoxGeometry(121.0, 0.42, 0.18),
+        concreteTrimMat
+      );
+      parapet.position.set(0, 14.15, pz);
+      piersAndDeckGroup.add(parapet);
+    });
+
+    const lampMat = new THREE.MeshStandardMaterial({
+      color: 0xfff3d1,
+      emissive: 0xffd175,
+      emissiveIntensity: 0.7
+    });
+    for (let lx = -56; lx <= 56; lx += 8) {
+      const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.08, 1.35, 6), steelRibMat);
+      pole.position.set(lx, 14.8, 0.1);
+      piersAndDeckGroup.add(pole);
+
+      const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.14, 6, 6), lampMat);
+      bulb.position.set(lx, 15.5, 0.1);
+      piersAndDeckGroup.add(bulb);
+    }
+
+    // 30 Radial Spillway (Tainter) Gates
+    const gatesGroup = new THREE.Group();
+    diorama.add(gatesGroup);
+
+    const radialGates = [];
+    const gateWidth = bayPitch - 0.46;
+    const gateRadius = 2.75;
+    const gateArc = 0.78;
+
+    const skinGeom = new THREE.CylinderGeometry(
+      gateRadius,
+      gateRadius,
+      gateWidth,
+      10,
+      1,
+      true,
+      -Math.PI * 0.5 - gateArc * 0.48,
+      gateArc
+    );
+    skinGeom.rotateZ(Math.PI / 2);
+
+    const armGeom = new THREE.BoxGeometry(0.1, 0.18, gateRadius - 0.1);
+
+    for (let g = 0; g < NUM_GATES; g++) {
+      const gx = spillwayLeft + (g + 0.5) * bayPitch;
+      const gatePivot = new THREE.Group();
+      gatePivot.position.set(gx, 11.65, 3.1);
+
+      const skin = new THREE.Mesh(skinGeom, steelGateMat);
+      skin.castShadow = true;
+      skin.receiveShadow = true;
+      gatePivot.add(skin);
+
+      [-0.55, 0.0, 0.55].forEach((ry) => {
+        const rib = new THREE.Mesh(
+          new THREE.BoxGeometry(gateWidth, 0.14, 0.22),
+          steelRibMat
+        );
+        rib.position.set(0, ry - 0.35, -gateRadius + 0.08);
+        gatePivot.add(rib);
+      });
+
+      [-gateWidth * 0.44, gateWidth * 0.44].forEach((ax) => {
+        const upperArm = new THREE.Mesh(armGeom, steelRibMat);
+        upperArm.position.set(ax, 0.15, -gateRadius * 0.5);
+        upperArm.rotation.x = 0.18;
+        gatePivot.add(upperArm);
+
+        const lowerArm = new THREE.Mesh(armGeom, steelRibMat);
+        lowerArm.position.set(ax, -0.65, -gateRadius * 0.5);
+        lowerArm.rotation.x = -0.25;
+        gatePivot.add(lowerArm);
+      });
+
+      gatesGroup.add(gatePivot);
+      radialGates.push({
+        pivot: gatePivot,
+        baseX: gx,
+        baseY: 11.65,
+        baseZ: 3.1,
+        index: g
+      });
+    }
+
+    // ---------------------------------------------------------
+    // 5. Underground Hydroelectric Powerhouse Cutaway & Canal Head Powerhouse (1,450 MW)
+    // ---------------------------------------------------------
+    const powerhouseGroup = new THREE.Group();
+    diorama.add(powerhouseGroup);
+
+    const cavernFrameMat = new THREE.MeshStandardMaterial({
+      color: 0xd9dfe4,
+      roughness: 0.65
+    });
+
+    const cavernBackWall = new THREE.Mesh(new THREE.BoxGeometry(24.5, 11.5, 1.2), cavernFrameMat);
+    cavernBackWall.position.set(48.0, 0.6, 2.2);
+    cavernBackWall.receiveShadow = true;
+    powerhouseGroup.add(cavernBackWall);
+
+    const cavernSideWall = new THREE.Mesh(new THREE.BoxGeometry(1.2, 11.5, 19.5), cavernFrameMat);
+    cavernSideWall.position.set(36.0, 0.6, 11.4);
+    cavernSideWall.receiveShadow = true;
+    powerhouseGroup.add(cavernSideWall);
+
+    const vaultRoof = new THREE.Mesh(
+      new THREE.CylinderGeometry(6.2, 6.2, 23.8, 16, 1, true, 0, Math.PI),
+      new THREE.MeshStandardMaterial({
+        color: 0xe6ebef,
+        roughness: 0.6,
+        side: THREE.DoubleSide
+      })
+    );
+    vaultRoof.rotation.z = Math.PI / 2;
+    vaultRoof.position.set(48.0, 4.4, 8.2);
+    powerhouseGroup.add(vaultRoof);
+
+    const ceilingStrip = new THREE.Mesh(
+      new THREE.BoxGeometry(22.0, 0.25, 0.8),
+      new THREE.MeshStandardMaterial({
+        color: 0xfff2cc,
+        emissive: 0xffb84d,
+        emissiveIntensity: 1.5
+      })
+    );
+    ceilingStrip.position.set(48.0, 9.8, 8.2);
+    powerhouseGroup.add(ceilingStrip);
+
+    const machineFloor = new THREE.Mesh(
+      new THREE.BoxGeometry(24.2, 1.2, 17.5),
+      concreteTrimMat
+    );
+    machineFloor.position.set(48.0, -3.6, 10.6);
+    machineFloor.receiveShadow = true;
+    powerhouseGroup.add(machineFloor);
+
+    const penstockMat = new THREE.MeshStandardMaterial({
+      color: 0x3b4956,
+      roughness: 0.4,
+      metalness: 0.65
+    });
+
+    const turbineUnits = [];
+    for (let u = 0; u < 6; u++) {
+      const ux = 38.6 + u * 3.75;
+
+      const penstock = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.68, 0.68, 13.5, 12),
+        penstockMat
+      );
+      penstock.position.set(ux, 3.2, 1.4);
+      penstock.rotation.x = 0.68;
+      penstock.castShadow = true;
+      powerhouseGroup.add(penstock);
+
+      const unitGroup = new THREE.Group();
+      unitGroup.position.set(ux, -1.6, 8.2);
+
+      const spiral = new THREE.Mesh(
+        new THREE.TorusGeometry(1.05, 0.45, 8, 16),
+        penstockMat
+      );
+      spiral.rotation.x = Math.PI / 2;
+      spiral.position.y = -0.6;
+      unitGroup.add(spiral);
+
+      const stator = new THREE.Mesh(
+        new THREE.CylinderGeometry(1.22, 1.28, 2.1, 16),
+        turbineBlueMat
+      );
+      stator.position.y = 0.85;
+      stator.castShadow = true;
+      unitGroup.add(stator);
+
+      const rotor = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.75, 0.85, 0.65, 8),
+        turbineGoldMat
+      );
+      rotor.position.y = 2.15;
+      unitGroup.add(rotor);
+
+      const tailrace = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.55, 0.62, 9.5, 10),
+        penstockMat
+      );
+      tailrace.rotation.x = Math.PI / 2;
+      tailrace.position.set(0, -1.0, 5.2);
+      unitGroup.add(tailrace);
+
+      powerhouseGroup.add(unitGroup);
+      turbineUnits.push({
+        group: unitGroup,
+        rotor,
+        penstock,
+        targetY: -1.6,
+        index: u
+      });
+    }
+
+    // Canal Head Powerhouse (250 MW)
+    const chphGroup = new THREE.Group();
+    const chphHall = new THREE.Mesh(
+      new THREE.BoxGeometry(9.6, 4.6, 6.2),
+      concreteMat
+    );
+    chphHall.position.set(45.5, 11.8, -12.5);
+    chphHall.castShadow = true;
+    chphHall.receiveShadow = true;
+    chphGroup.add(chphHall);
+
+    const chphRoof = new THREE.Mesh(
+      new THREE.BoxGeometry(10.2, 0.5, 6.8),
+      turbineBlueMat
+    );
+    chphRoof.position.set(45.5, 14.3, -12.5);
+    chphGroup.add(chphRoof);
+    powerhouseGroup.add(chphGroup);
+
+    // ---------------------------------------------------------
+    // 6. Narmada Main Canal Concrete Lining
+    // ---------------------------------------------------------
+    function buildCanalLining() {
+      const segs = 64;
+      const zStart = -15.0;
+      const zEnd = 87.8;
+      const verts = [];
+      const indices = [];
+
+      const prof = [
+        [-3.6, 10.65],
+        [-1.8, 8.45],
+        [1.8, 8.45],
+        [3.6, 10.65]
+      ];
+
+      for (let i = 0; i <= segs; i++) {
+        const z = lerp(zStart, zEnd, i / segs);
+        const cx = getCanalCenterX(z);
+        for (let p = 0; p < prof.length; p++) {
+          verts.push(cx + prof[p][0], prof[p][1], z);
+        }
+      }
+
+      for (let i = 0; i < segs; i++) {
+        const rowA = i * 4;
+        const rowB = (i + 1) * 4;
+        for (let p = 0; p < 3; p++) {
+          const a = rowA + p;
+          const b = rowA + p + 1;
+          const c = rowB + p;
+          const d = rowB + p + 1;
+          indices.push(a, c, b, b, c, d);
+        }
+      }
+
+      const geom = new THREE.BufferGeometry();
+      geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
+      geom.setIndex(indices);
+      geom.computeVertexNormals();
+
+      const mat = new THREE.MeshStandardMaterial({
+        color: 0xdce2e6,
+        roughness: 0.72,
+        side: THREE.DoubleSide
+      });
+      const mesh = new THREE.Mesh(geom, mat);
+      mesh.receiveShadow = true;
+      return mesh;
+    }
+
+    const canalLiningMesh = buildCanalLining();
+    diorama.add(canalLiningMesh);
+
+    // ---------------------------------------------------------
+    // 7. Water System: Upstream Reservoir, Canal Flow, Spillway Cascades & Downstream River
+    // ---------------------------------------------------------
+    const waterGroup = new THREE.Group();
+    diorama.add(waterGroup);
+
+    const reservoirMat = new THREE.MeshStandardMaterial({
+      color: 0x0d727e,
+      emissive: 0x05333a,
+      emissiveIntensity: 0.35,
+      normalMap: waterNormalTex,
+      normalScale: new THREE.Vector2(0.45, 0.45),
+      roughness: 0.16,
+      metalness: 0.12,
+      transparent: true,
+      opacity: 0.93
+    });
+
+    const reservoirBox = new THREE.Mesh(
+      new THREE.BoxGeometry(151.6, 15.5, 87.75),
+      reservoirMat
+    );
+    reservoirBox.position.set(0, -10.0, -43.92);
+    reservoirBox.receiveShadow = true;
+    waterGroup.add(reservoirBox);
+
+    function buildCanalWaterMesh() {
+      const segs = 64;
+      const zStart = -14.5;
+      const zEnd = 87.8;
+      const verts = [];
+      const uvs = [];
+      const indices = [];
+
+      for (let i = 0; i <= segs; i++) {
+        const t = i / segs;
+        const z = lerp(zStart, zEnd, t);
+        const cx = getCanalCenterX(z);
+        verts.push(cx - 2.95, 9.95, z);
+        verts.push(cx + 2.95, 9.95, z);
+        uvs.push(0, t * 14);
+        uvs.push(1, t * 14);
+      }
+
+      for (let i = 0; i < segs; i++) {
+        const a = i * 2;
+        const b = a + 1;
+        const c = a + 2;
+        const d = a + 3;
+        indices.push(a, c, b, b, c, d);
+      }
+
+      const geom = new THREE.BufferGeometry();
+      geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
+      geom.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+      geom.setIndex(indices);
+      geom.computeVertexNormals();
+
+      const mat = new THREE.MeshStandardMaterial({
+        color: 0x1596a4,
+        emissive: 0x07434b,
+        emissiveIntensity: 0.35,
+        normalMap: waterNormalTex,
+        normalScale: new THREE.Vector2(0.5, 0.5),
+        roughness: 0.18,
+        transparent: true,
+        opacity: 0.94
+      });
+      return new THREE.Mesh(geom, mat);
+    }
+
+    const canalWaterMesh = buildCanalWaterMesh();
+    waterGroup.add(canalWaterMesh);
+
+    function buildDownstreamRiverMesh() {
+      const segs = 56;
+      const zStart = 15.5;
+      const zEnd = 87.8;
+      const verts = [];
+      const uvs = [];
+      const indices = [];
+
+      for (let i = 0; i <= segs; i++) {
+        const t = i / segs;
+        const z = lerp(zStart, zEnd, t);
+        const rcx = getRiverCenterX(z);
+        const halfW = z < 28 ? lerp(32.5, 14.5, smoothstep(15.5, 28.0, z)) : 14.5 + Math.sin(z * 0.08) * 1.5;
+        verts.push(rcx - halfW, -1.9, z);
+        verts.push(rcx + halfW, -1.9, z);
+        uvs.push(0, t * 10);
+        uvs.push(1, t * 10);
+      }
+
+      for (let i = 0; i < segs; i++) {
+        const a = i * 2;
+        const b = a + 1;
+        const c = a + 2;
+        const d = a + 3;
+        indices.push(a, c, b, b, c, d);
+      }
+
+      const geom = new THREE.BufferGeometry();
+      geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
+      geom.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+      geom.setIndex(indices);
+      geom.computeVertexNormals();
+
+      const mat = new THREE.MeshStandardMaterial({
+        color: 0x117f8d,
+        emissive: 0x05353c,
+        emissiveIntensity: 0.32,
+        normalMap: waterNormalTex,
+        normalScale: new THREE.Vector2(0.55, 0.55),
+        roughness: 0.2,
+        transparent: true,
+        opacity: 0.92
+      });
+      return new THREE.Mesh(geom, mat);
+    }
+
+    const downstreamRiverMesh = buildDownstreamRiverMesh();
+    waterGroup.add(downstreamRiverMesh);
+
+    function createCascadeSheetGeometry(width) {
+      const pts = [
+        [0.45, 10.65],
+        [1.45, 9.95],
+        [4.5, 6.95],
+        [8.5, 3.05],
+        [12.8, -1.15],
+        [14.8, -1.95],
+        [16.2, -1.25]
+      ];
+      const verts = [];
+      const uvs = [];
+      const indices = [];
+
+      for (let i = 0; i < pts.length; i++) {
+        const v = i / (pts.length - 1);
+        const [pz, py] = pts[i];
+        verts.push(-width * 0.5, py, pz);
+        verts.push(width * 0.5, py, pz);
+        uvs.push(0, v);
+        uvs.push(1, v);
+      }
+
+      for (let i = 0; i < pts.length - 1; i++) {
+        const a = i * 2;
+        const b = a + 1;
+        const c = a + 2;
+        const d = a + 3;
+        indices.push(a, c, b, b, c, d);
+      }
+
+      const geom = new THREE.BufferGeometry();
+      geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
+      geom.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+      geom.setIndex(indices);
+      geom.computeVertexNormals();
+      return geom;
+    }
+
+    const cascadeMat = new THREE.MeshStandardMaterial({
+      color: 0xdff9fc,
+      map: cascadeTex,
+      emissive: 0x36b5c4,
+      emissiveIntensity: 0.35,
+      roughness: 0.25,
+      transparent: true,
+      opacity: 0.92,
+      side: THREE.DoubleSide
+    });
+
+    const cascadeSheetGeom = createCascadeSheetGeometry(gateWidth - 0.04);
+    const cascadeSheets = [];
+    for (let g = 0; g < NUM_GATES; g++) {
+      const gx = spillwayLeft + (g + 0.5) * bayPitch;
+      const sheet = new THREE.Mesh(cascadeSheetGeom, cascadeMat);
+      sheet.position.set(gx, 0, 0);
+      sheet.visible = false;
+      waterGroup.add(sheet);
+      cascadeSheets.push(sheet);
+    }
+
+    const foamPlumes = [];
+    const foamMat = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      emissive: 0x9ceaf2,
+      emissiveIntensity: 0.35,
+      roughness: 0.55,
+      transparent: true,
+      opacity: 0.88
+    });
+    for (let f = 0; f < 26; f++) {
+      const fx = lerp(-30.5, 30.5, f / 25);
+      const radius = 1.35 + hash2D(f, 3.7) * 0.75;
+      const plume = new THREE.Mesh(new THREE.DodecahedronGeometry(radius, 1), foamMat);
+      plume.position.set(fx, -1.65, 16.8 + (f % 3) * 1.4);
+      plume.scale.set(1.4, 0.55, 1.3);
+      plume.visible = false;
+      waterGroup.add(plume);
+      foamPlumes.push({
+        mesh: plume,
+        baseX: fx,
+        baseZ: 16.8 + (f % 3) * 1.4,
+        phase: f * 0.9
+      });
+    }
+
+    // ---------------------------------------------------------
+    // 8. Architectural 3D Dimension Lines (163 m Height & 1,210 m Span)
+    // ---------------------------------------------------------
+    const dimGroup = new THREE.Group();
+    diorama.add(dimGroup);
+
+    const dimMat = new THREE.MeshBasicMaterial({
+      color: 0xd48324,
+      transparent: true,
+      opacity: 0
+    });
+
+    const heightBar = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 16.3, 8), dimMat);
+    heightBar.position.set(-34.6, 4.95, 1.2);
+    dimGroup.add(heightBar);
+
+    const heightTickTop = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.25, 0.25), dimMat);
+    heightTickTop.position.set(-34.6, 13.1, 1.2);
+    dimGroup.add(heightTickTop);
+
+    const heightTickBot = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.25, 0.25), dimMat);
+    heightTickBot.position.set(-34.6, -3.2, 1.2);
+    dimGroup.add(heightTickBot);
+
+    const spanBar = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 121.0, 8), dimMat);
+    spanBar.rotation.z = Math.PI / 2;
+    spanBar.position.set(0, 16.4, 1.1);
+    dimGroup.add(spanBar);
+
+    [-60.5, 60.5].forEach((sx) => {
+      const tick = new THREE.Mesh(new THREE.BoxGeometry(0.25, 2.2, 0.25), dimMat);
+      tick.position.set(sx, 16.4, 1.1);
+      dimGroup.add(tick);
+    });
+
+    // ---------------------------------------------------------
+    // 9. Projected HTML Callouts & SVG Leader Lines
+    // ---------------------------------------------------------
+    const calloutsContainer = document.getElementById('callouts-container');
+    const leaderSvg = document.getElementById('leader-svg');
+    const finaleCard = document.getElementById('finale-card');
+    const progressFill = document.getElementById('progress-fill');
+    const stageLabelEls = Array.from(document.querySelectorAll('#stage-labels span'));
+
+    const CALLOUT_DEFS = [
+      {
+        id: 'gorge',
+        tag: 'Natural Site',
+        title: 'Satpura & Vindhya Gorge',
+        desc: 'Steep basalt canyon walls anchor the dam across the Narmada River',
+        accent: '',
+        anchor: new THREE.Vector3(-48, 22, -26),
+        offsetX: -120,
+        offsetY: -220,
+        tIn: [0.15, 0.65],
+        tOut: [4.2, 4.8]
+      },
+      {
+        id: 'foundation',
+        tag: 'Substructure',
+        title: 'Deep Basalt Foundation',
+        desc: 'Keyed into solid volcanic rock to resist massive water thrust',
+        accent: 'accent-gold',
+        anchor: new THREE.Vector3(-8, -2.5, 11),
+        offsetX: -190,
+        offsetY: 220,
+        tIn: [0.55, 1.1],
+        tOut: [4.5, 5.1]
+      },
+      {
+        id: 'height',
+        tag: 'Vertical Scale',
+        title: '163 m Tall',
+        desc: 'Above deepest foundation — one of India’s highest gravity dams',
+        accent: 'accent-gold',
+        anchor: new THREE.Vector3(-34.6, 7.5, 1.2),
+        offsetX: -210,
+        offsetY: -245,
+        tIn: [3.2, 3.8],
+        tOut: [8.8, 9.4]
+      },
+      {
+        id: 'length',
+        tag: 'Concrete Gravity Design',
+        title: '1,210 m Long',
+        desc: 'Stepped concrete gravity monoliths hold back water by sheer weight',
+        accent: '',
+        anchor: new THREE.Vector3(24, 15.8, 1.1),
+        offsetX: 95,
+        offsetY: -275,
+        tIn: [3.8, 4.4],
+        tOut: [9.2, 9.8]
+      },
+      {
+        id: 'gates',
+        tag: 'Flood Control',
+        title: '30 Radial Spillway Gates',
+        desc: 'Curved steel Tainter gates regulate peak monsoon river discharge',
+        accent: 'accent-blue',
+        anchor: new THREE.Vector3(-4, 12.2, 1.8),
+        offsetX: -175,
+        offsetY: -265,
+        tIn: [6.8, 7.4],
+        tOut: [12.3, 12.9]
+      },
+      {
+        id: 'powerhouse',
+        tag: 'Clean Hydropower',
+        title: '1,450 MW Powerhouses',
+        desc: 'Underground River Bed cavern (1,200 MW) + Canal Head (250 MW)',
+        accent: 'accent-gold',
+        anchor: new THREE.Vector3(47, 1.5, 9.5),
+        offsetX: 60,
+        offsetY: 235,
+        tIn: [9.9, 10.5],
+        tOut: [15.5, 16.1]
+      },
+      {
+        id: 'reservoir',
+        tag: 'Water Storage',
+        title: 'Deep Teal Reservoir',
+        desc: 'Impounds Narmada monsoon flow upstream between the two ranges',
+        accent: '',
+        anchor: new THREE.Vector3(-24, 10.5, -42),
+        offsetX: -195,
+        offsetY: -245,
+        tIn: [13.0, 13.6],
+        tOut: [16.5, 17.1]
+      },
+      {
+        id: 'canal',
+        tag: 'Irrigation Lifeline',
+        title: 'Narmada Main Canal',
+        desc: 'Feeds irrigation & drinking water across arid Gujarat',
+        accent: 'accent-blue',
+        anchor: new THREE.Vector3(53, 10.0, 46),
+        offsetX: 55,
+        offsetY: 225,
+        tIn: [14.1, 14.7],
+        tOut: [19.4, 20.0]
+      }
+    ];
+
+    const calloutNodes = CALLOUT_DEFS.map((def) => {
+      const el = document.createElement('div');
+      el.className = `callout ${def.accent}`;
+      el.innerHTML = `
+        <div class="callout-tag">${def.tag}</div>
+        <div class="callout-title">${def.title}</div>
+        <div class="callout-desc">${def.desc}</div>
+      `;
+      el.style.opacity = '0';
+      calloutsContainer.appendChild(el);
+
+      const svgGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      svgGroup.style.opacity = '0';
+
+      const lineGlow = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+      lineGlow.setAttribute('fill', 'none');
+      lineGlow.setAttribute('stroke', 'rgba(255,255,255,0.9)');
+      lineGlow.setAttribute('stroke-width', '7');
+      lineGlow.setAttribute('stroke-linecap', 'round');
+      lineGlow.setAttribute('stroke-linejoin', 'round');
+
+      const lineMain = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+      lineMain.setAttribute('fill', 'none');
+      lineMain.setAttribute('stroke', '#132129');
+      lineMain.setAttribute('stroke-width', '3.2');
+      lineMain.setAttribute('stroke-linecap', 'round');
+      lineMain.setAttribute('stroke-linejoin', 'round');
+
+      const dotOuter = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      dotOuter.setAttribute('r', '11');
+      dotOuter.setAttribute('fill', 'rgba(255,255,255,0.92)');
+
+      const dotInner = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      dotInner.setAttribute('r', '6');
+      dotInner.setAttribute('fill', def.accent === 'accent-gold' ? '#d48324' : '#0d7480');
+
+      svgGroup.appendChild(lineGlow);
+      svgGroup.appendChild(lineMain);
+      svgGroup.appendChild(dotOuter);
+      svgGroup.appendChild(dotInner);
+      leaderSvg.appendChild(svgGroup);
+
+      return { def, el, svgGroup, lineGlow, lineMain, dotOuter, dotInner };
+    });
+
+    function projectToScreen(vec3) {
+      const p = vec3.clone().project(camera);
+      return {
+        x: (p.x * 0.5 + 0.5) * WIDTH,
+        y: (-p.y * 0.5 + 0.5) * HEIGHT
+      };
+    }
+
+    // ---------------------------------------------------------
+    // 10. Deterministic Frame Renderer
+    // ---------------------------------------------------------
+    const _camTarget = new THREE.Vector3(0, 3.5, 1.0);
+    let currentT = 0;
+
+    function renderFrame(rawT) {
+      const t = clamp(Number(rawT) || 0, 0, window.DURATION);
+      currentT = t;
+
+      // Timeline Bar & Stage Highlight
+      progressFill.style.width = `${(t / window.DURATION) * 100}%`;
+      const activeStage =
+        t < 2.4 ? 0 :
+        t < 6.2 ? 1 :
+        t < 9.5 ? 2 :
+        t < 12.8 ? 3 :
+        t < 16.2 ? 4 : 5;
+
+      stageLabelEls.forEach((span, idx) => {
+        if (idx === activeStage) span.classList.add('active');
+        else span.classList.remove('active');
+      });
+
+      // Act 1: Foundation trench blocks & stilling basin drop in immediately (0.1s - 1.9s)
+      foundationBlocks.forEach((fb) => {
+        const p = easeOutCubic((t - (0.1 + fb.delay)) / 0.85);
+        fb.mesh.visible = p > 0.001;
+        fb.mesh.position.y = lerp(fb.targetY + 14, fb.targetY, p);
+      });
+      const basinP = easeOutCubic((t - 0.9) / 0.9);
+      stillingBasin.visible = basinP > 0.001;
+      stillingBasin.position.y = lerp(12, 0, basinP);
+
+      // Act 2: Concrete Gravity Dam Monoliths Assemble (1.8s - 5.4s)
+      monolithItems.forEach((item) => {
+        const startT = 1.8 + item.order * 2.2;
+        const p = easeOutCubic((t - startT) / 0.95);
+        item.mesh.visible = p > 0.001;
+        item.mesh.position.y = lerp(24, item.targetY, p);
+      });
+
+      // 3D Dimension lines (163 m & 1,210 m)
+      const dimOpacity = windowPulse(t, 3.3, 3.9, 8.9, 9.6);
+      dimMat.opacity = dimOpacity;
+      dimGroup.visible = dimOpacity > 0.01;
+      heightBar.scale.y = easeOutCubic((t - 3.2) / 0.7) || 0.001;
+      spanBar.scale.y = easeOutCubic((t - 3.7) / 0.7) || 0.001;
+
+      // Act 3: Spillway Piers, Crest Deck & 30 Radial Gates (5.2s - 8.9s)
+      const piersP = easeOutCubic((t - 5.2) / 0.9);
+      piersAndDeckGroup.visible = piersP > 0.001;
+      piersAndDeckGroup.position.y = lerp(18, 0, piersP);
+
+      const spillwayOpenP = easeInOutCubic((t - 16.2) / 1.5);
+
+      radialGates.forEach((g) => {
+        const installStart = 6.1 + (g.index / NUM_GATES) * 2.0;
+        const installP = easeOutCubic((t - installStart) / 0.65);
+        g.pivot.visible = installP > 0.001;
+        g.pivot.position.y = lerp(g.baseY + 14, g.baseY, installP);
+        g.pivot.rotation.x = -spillwayOpenP * 0.62;
+      });
+
+      // Act 4: Underground Hydroelectric Powerhouses (9.5s - 12.6s)
+      const phP = easeOutCubic((t - 9.5) / 1.1);
+      powerhouseGroup.visible = phP > 0.001;
+      cavernLight.intensity = phP * (2.6 + Math.sin(t * 4.0) * 0.25);
+
+      turbineUnits.forEach((u) => {
+        const uStart = 9.8 + u.index * 0.28;
+        const up = easeOutCubic((t - uStart) / 0.85);
+        u.group.visible = up > 0.001;
+        u.group.position.y = lerp(u.targetY + 11, u.targetY, up);
+        u.penstock.visible = up > 0.05;
+        u.penstock.scale.y = clamp(up * 1.15, 0.01, 1);
+        const spinFactor = smoothstep(11.2, 12.7, t);
+        u.rotor.rotation.y = t * 7.5 * spinFactor + u.index * 0.5;
+      });
+
+      const chphP = easeOutCubic((t - 10.9) / 0.9);
+      chphGroup.visible = chphP > 0.001;
+      chphGroup.position.y = lerp(12, 0, chphP);
+
+      // Act 5 & 6: Water Filling, Narmada Main Canal & Spillway Cascades
+      waterNormalTex.offset.set(t * 0.028, -t * 0.052);
+      cascadeTex.offset.set(0, -t * 1.45);
+
+      const riverRise = spillwayOpenP * 0.75;
+      downstreamRiverMesh.position.y = riverRise;
+      downstreamRiverMesh.scale.x = 1 + spillwayOpenP * 0.14;
+
+      const resFillP = easeInOutCubic((t - 12.7) / 2.6);
+      const topWaterY = lerp(-2.25, 11.15, resFillP) - spillwayOpenP * 0.25;
+      reservoirBox.position.y = topWaterY - 15.5 * 0.5;
+
+      const canalFillP = easeOutCubic((t - 14.1) / 1.2);
+      canalWaterMesh.visible = canalFillP > 0.01;
+      canalWaterMesh.position.y = lerp(-1.45, 0.0, canalFillP);
+      canalWaterMesh.material.opacity = canalFillP * 0.94;
+
+      const cascadeP = easeOutCubic((t - 16.35) / 0.85);
+      cascadeSheets.forEach((sheet, idx) => {
+        sheet.visible = cascadeP > 0.01;
+        if (sheet.visible) {
+          const wave = 1 + Math.sin(t * 9.0 + idx * 0.7) * 0.03;
+          sheet.scale.set(1, cascadeP * wave, 1);
+        }
+      });
+
+      foamPlumes.forEach((fp) => {
+        fp.mesh.visible = cascadeP > 0.15;
+        if (fp.mesh.visible) {
+          const bounce = Math.sin(t * 8.5 + fp.phase) * 0.22;
+          fp.mesh.position.y = -1.65 + cascadeP * 0.55 + bounce;
+          const s = (0.7 + cascadeP * 0.65) * (1 + Math.sin(t * 7.0 + fp.phase) * 0.12);
+          fp.mesh.scale.set(1.45 * s, 0.62 * s, 1.35 * s);
+          fp.mesh.rotation.y = t * 1.8 + fp.phase;
+        }
+      });
+
+      // Cinematic Slowly Orbiting Aerial Camera
+      let azimuth;
+      if (t < 10.0) {
+        azimuth = lerp(-0.52, 0.18, easeInOutCubic(t / 10.0));
+      } else if (t < 16.0) {
+        azimuth = lerp(0.18, 0.62, easeInOutCubic((t - 10.0) / 6.0));
+      } else {
+        azimuth = lerp(0.62, 0.24, easeInOutCubic((t - 16.0) / 4.0));
+      }
+
+      const radius =
+        t < 10.0 ? lerp(312, 286, easeInOutCubic(t / 10.0)) :
+        t < 16.0 ? lerp(286, 294, easeInOutCubic((t - 10.0) / 6.0)) :
+        lerp(294, 308, easeInOutCubic((t - 16.0) / 4.0));
+
+      const camY =
+        t < 8.0 ? lerp(205, 166, easeInOutCubic(t / 8.0)) :
+        t < 14.0 ? lerp(166, 178, easeInOutCubic((t - 8.0) / 6.0)) :
+        lerp(178, 198, easeInOutCubic((t - 14.0) / 6.0));
+
+      camera.position.set(
+        Math.sin(azimuth) * radius,
+        camY,
+        Math.cos(azimuth) * radius
+      );
+      camera.lookAt(_camTarget);
+      camera.updateMatrixWorld();
+
+      // Update Projected Callout Cards & SVG Leader Lines
+      calloutNodes.forEach(({ def, el, svgGroup, lineGlow, lineMain, dotOuter, dotInner }) => {
+        const vis = windowPulse(t, def.tIn[0], def.tIn[1], def.tOut[0], def.tOut[1]);
+        if (vis <= 0.01) {
+          el.style.opacity = '0';
+          svgGroup.style.opacity = '0';
+          return;
+        }
+
+        const pt = projectToScreen(def.anchor);
+        const cardW = el.offsetWidth || 330;
+        const cardH = el.offsetHeight || 120;
+
+        const rawLeft = pt.x + def.offsetX - cardW * 0.5;
+        const rawTop = pt.y + def.offsetY - cardH * 0.5;
+
+        const cardLeft = clamp(rawLeft, 48, WIDTH - 48 - cardW);
+        const cardTop = clamp(rawTop, 300, HEIGHT - 220 - cardH);
+
+        const slideY = (1 - vis) * 14;
+        el.style.opacity = vis.toFixed(3);
+        el.style.transform = `translate3d(${cardLeft.toFixed(1)}px, ${(cardTop + slideY).toFixed(1)}px, 0)`;
+
+        const attachY = pt.y < cardTop + cardH * 0.5 ? cardTop : cardTop + cardH;
+        const attachX = clamp(pt.x, cardLeft + 36, cardLeft + cardW - 36);
+        const midY = lerp(pt.y, attachY, 0.55);
+
+        const ptsStr = `${pt.x.toFixed(1)},${pt.y.toFixed(1)} ${attachX.toFixed(1)},${midY.toFixed(1)} ${attachX.toFixed(1)},${attachY.toFixed(1)}`;
+        lineGlow.setAttribute('points', ptsStr);
+        lineMain.setAttribute('points', ptsStr);
+        dotOuter.setAttribute('cx', pt.x.toFixed(1));
+        dotOuter.setAttribute('cy', pt.y.toFixed(1));
+        dotInner.setAttribute('cx', pt.x.toFixed(1));
+        dotInner.setAttribute('cy', pt.y.toFixed(1));
+        svgGroup.style.opacity = vis.toFixed(3);
+      });
+
+      // Finale Milestone Card (16.8s - 20.0s)
+      const finaleVis = smoothstep(16.8, 17.5, t);
+      finaleCard.style.opacity = finaleVis.toFixed(3);
+      finaleCard.style.transform = `translate3d(0, ${((1 - finaleVis) * 18).toFixed(1)}px, 0)`;
+
+      renderer.render(scene, camera);
+    }
+
+    // ---------------------------------------------------------
+    // 11. Deterministic API + Auto-Start Preview (Zero rAF)
+    // ---------------------------------------------------------
+    const playToggleBtn = document.getElementById('play-toggle');
+    const progressTrack = document.getElementById('progress-track');
+    let isPlaying = true;
+    let clockOrigin = performance.now() - (window.__queuedT || 0) * 1000;
+    let autoInterval = null;
+
+    function stopAutoPlay() {
+      isPlaying = false;
+      if (autoInterval !== null) {
+        clearInterval(autoInterval);
+        autoInterval = null;
+      }
+      if (playToggleBtn) playToggleBtn.textContent = 'Play';
+    }
+
+    function startAutoPlay(fromT) {
+      if (autoInterval !== null) clearInterval(autoInterval);
+      isPlaying = true;
+      clockOrigin = performance.now() - fromT * 1000;
+      if (playToggleBtn) playToggleBtn.textContent = 'Pause';
+      autoInterval = setInterval(() => {
+        if (window.__externalCapture || !isPlaying) {
+          stopAutoPlay();
+          return;
+        }
+        const elapsed = ((performance.now() - clockOrigin) / 1000) % window.DURATION;
+        renderFrame(elapsed);
+      }, 33);
+    }
+
+    window.renderAt = function renderAt(t) {
+      const val = Number(t) || 0;
+      window.__renderCallCount += 1;
+      if (val > 0.001 || window.__renderCallCount > 1) {
+        window.__externalCapture = true;
+        stopAutoPlay();
+        if (playToggleBtn) playToggleBtn.style.display = 'none';
+      }
+      renderFrame(val);
+    };
+
+    if (playToggleBtn) {
+      playToggleBtn.addEventListener('click', () => {
+        window.__externalCapture = false;
+        if (isPlaying) {
+          stopAutoPlay();
+        } else {
+          startAutoPlay(currentT);
+        }
+      });
+    }
+
+    if (progressTrack) {
+      progressTrack.addEventListener('click', (e) => {
+        const rect = progressTrack.getBoundingClientRect();
+        const ratio = clamp((e.clientX - rect.left) / rect.width, 0, 1);
+        const seekT = ratio * window.DURATION;
+        window.__externalCapture = false;
+        renderFrame(seekT);
+        if (isPlaying) startAutoPlay(seekT);
+      });
+    }
+
+    // Render initial frame immediately and begin playback on page load
+    renderFrame(window.__queuedT || 0);
+    if (!window.__externalCapture) {
+      startAutoPlay(window.__queuedT || 0);
+    } else if (playToggleBtn) {
+      playToggleBtn.style.display = 'none';
+    }
+  </script>
 </body>
 </html>
